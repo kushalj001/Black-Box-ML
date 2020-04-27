@@ -4,7 +4,7 @@
         "post0": {
             "title": "WELCOME AYUSH SIR",
             "content": "My blog has been really enlighted by your presence. . This post will make the blog trending in no time. To wish you on your birthday in this trying times on this platform...WOW!. The utility of the blog has been increased tenfold. . Let the world know that while LSTM&#39;s and Embeddings are useful, nothing matters if the edium is not used to wish your dear friends. . That said, let&#39;s just jeep wishing you forever. . print(&quot;From everyone here at ADB - &quot;) while True: print(&quot;HAPPY BIRTHDAY AAYUSH&quot;) . Moving on, . Your next clue will take you to another location out there. (Just like life...ain&#39;t it?) . Your job is to piece together answers to the quiz to form a new link that will be your next destination. . Well, Thank you. . LETS BEGIN . The link - &quot;bit.ly/___&quot; . Figure out the next seven characters after &#39;/&#39; . The characters might be digits or capital letters | . Character 1 (Digit)- . You have heard it, so you would know... Let those memory cells in you flow... . It is the first character of a famous song... If you try hard, you won&#39;t be wrong. . Song - . If you still don&#39;t get it...you are not really keen. I hope your day still may be green. . Character 2 (Capital Letter) . Well, you figured that out? . . I hope you are a fan of Natalie Portman. Because Why not? . So, Jimit shaved his head for this qurantine. And so did Natalie Portman&#39;s character for this movie . Guess the movie and there you will have your character as well. . Also, V all really love you. . Character 3 (Capital Letter) . Are you hating this quiz, well then . While we were scared that Word War 3 might break out... . The guy from &quot;I hate Rachel Green Club&quot; was fighting a different world war altogether&quot; . Guess his war and there you shall have it. If not, then come on, think a bit . Character 4 (Digit) . We all just need a million dollars (Not Jimit though). . Or maybe we just need to find the one Rachel out there for us as well? But, what if she might be a lesbian? . &quot;The _____ where it all began&quot; . Character 5 (Capital Letter) . Now, there is no time to halt... The clue here is the final QUEEN in the North. . She also played Phoenix (Jean Grey) in the Movie: X-Men Now, this will be figured out even by a layman... . 2nd letter of the Last Name of this girl. . Among other things, she also has a &quot;Derani-Jethani&quot; relationship with our girl - PC . Character 6 (Digit) . The episode that Michael left the office was such a tearjerker. We still miss him so dearly. He was a part of Office. He worked there for so much time. Similar to watching Die Hard 80000 times. . How much time exactly? How many minutes? I just don&#39;t recollect it. . The character is just middle digit of that number? . Also, after going to end up wherever we go, Remember to Call Or, it&#39;s going to hurt like a motherfucker. . Character 7 (Capital Letter) . TED&#39;s secret identity in How I Met your Mother. Pirate DJ Doctor _ (Real Fan of the band - DISHWALLA) . Or just - . James McAvoy at the Xavier&#39;s school for gifted Youngsters. Come on now...this couldn&#39;t get any easier. . PROFESSOR _ . End . Happy birthday once again . I hope you enjoyed the quiz. . Please proceed to the next destination - . LINK - bit.ly/{insert 7 characters from above here} . Note: If you were not listening...the characters are either digits or CAPITAL LETTERS. . .",
-            "url": "https://kushalj001.github.io/black-box-ml-2/2020/04/27/HAPPY_BIRTHDAY_AYUSH.html",
+            "url": "https://kushalj001.github.io/black-box-ml/2020/04/27/HAPPY_BIRTHDAY_AYUSH.html",
             "relUrl": "/2020/04/27/HAPPY_BIRTHDAY_AYUSH.html",
             "date": " • Apr 27, 2020"
         }
@@ -19,7 +19,7 @@
       ,"page1": {
           "title": "About Me",
           "content": "This is where you put the contents of your About page. Like all your pages, it’s in Markdown format. . This website is powered by fastpages 1. . a blogging platform that natively supports Jupyter notebooks in addition to other formats. &#8617; . |",
-          "url": "https://kushalj001.github.io/black-box-ml-2/about/",
+          "url": "https://kushalj001.github.io/black-box-ml/about/",
           "relUrl": "/about/",
           "date": ""
       }
@@ -51,7 +51,7 @@
       ,"page10": {
           "title": "",
           "content": "Sitemap: {{ “sitemap.xml” | absolute_url }} | .",
-          "url": "https://kushalj001.github.io/black-box-ml-2/robots.txt",
+          "url": "https://kushalj001.github.io/black-box-ml/robots.txt",
           "relUrl": "/robots.txt",
           "date": ""
       }
