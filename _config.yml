@@ -6,11 +6,11 @@
 # https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
 # https://learnxinyminutes.com/docs/yaml/
 
-title: fastpages
-description: An easy to use blogging platform with support for Jupyter Notebooks.
+title: Black Box ML
+description: All models are bad, some are useful.
 github_username: kushalj001
 # you can comment the below line out if your repo name is not different than your baseurl
-github_repo: "black-box-ml-2"
+github_repo: "black-box-ml"
 
 # OPTIONAL: override baseurl and url if using a custom domain
 # Note: leave out the trailing / from this value. 
@@ -34,7 +34,7 @@ url: "https://kushalj001.github.io" # the base hostname & protocol for your site
 #
 # 3. You must replace the parameter `baseurl` in _action_files/settings.ini with the same value as you set here but WITHOUT QUOTES.
 #
-baseurl: "/black-box-ml-2" # the subpath of your site, e.g. "/blog".
+baseurl: "/black-box-ml" # the subpath of your site, e.g. "/blog".
 
 # Github and twitter are optional:
 minima:
