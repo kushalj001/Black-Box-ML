@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Understanding LSTMs | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Understanding LSTMs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand the internal structure of LSTMs and implement from scratch using PyTorch." />
+<meta property="og:description" content="Understand the internal structure of LSTMs and implement from scratch using PyTorch." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-28T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"Understand the internal structure of LSTMs and implement from scratch using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html","headline":"Understanding LSTMs","dateModified":"2019-12-28T00:00:00-06:00","datePublished":"2019-12-28T00:00:00-06:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Understanding LSTMs | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Understanding LSTMs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand the internal structure of LSTMs and implement from scratch using PyTorch." />
+<meta property="og:description" content="Understand the internal structure of LSTMs and implement from scratch using PyTorch." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-28T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"Understand the internal structure of LSTMs and implement from scratch using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html","headline":"Understanding LSTMs","dateModified":"2019-12-28T00:00:00-06:00","datePublished":"2019-12-28T00:00:00-06:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/black-box-ml/">Black Box ML</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/black-box-ml/about/">About Me</a><a class="page-link" href="/black-box-ml/search/">Search</a><a class="page-link" href="/black-box-ml/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Understanding LSTMs</h1><p class="page-description">Understand the internal structure of LSTMs and implement from scratch using PyTorch.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-12-28T00:00:00-06:00" itemprop="datePublished">
+        Dec 28, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      9 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#lstm">lstm</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#pytorch">pytorch</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#gates">gates</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#vanishing gradient">vanishing gradient</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2019-12-28-Understanding LSTMs.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2019-12-28-Understanding+LSTMs.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2019-12-28-Understanding LSTMs.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Introduction">Introduction </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Why-another-blog-post-on-LSTMs?">Why another blog post on LSTMs? </a></li>
+<li class="toc-entry toc-h3"><a href="#Recurrent-Neural-Nets">Recurrent Neural Nets </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Understanding-the-LSTM-cell">Understanding the LSTM cell </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#The-forget-gate">The forget gate </a></li>
+<li class="toc-entry toc-h3"><a href="#The-input-and-the-cell-gate">The input and the cell gate </a></li>
+<li class="toc-entry toc-h3"><a href="#Cell-update">Cell update </a></li>
+<li class="toc-entry toc-h3"><a href="#Output-gate">Output gate </a></li>
+<li class="toc-entry toc-h3"><a href="#Why-do-we-use-tanh-for-calculating-cell-state?">Why do we use tanh for calculating cell state? </a></li>
+<li class="toc-entry toc-h3"><a href="#Why-do-we-use-tanh-while-calculating-output-gate-values?">Why do we use tanh while calculating output gate values? </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Implementation">Implementation </a></li>
+<li class="toc-entry toc-h2"><a href="#Acknowledgements-and-References">Acknowledgements and References </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2019-12-28-Understanding LSTMs.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">
+<a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
+</h2>
+<h3 id="Why-another-blog-post-on-LSTMs?">
+<a class="anchor" href="#Why-another-blog-post-on-LSTMs?" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why another blog post on LSTMs?<a class="anchor-link" href="#Why-another-blog-post-on-LSTMs?"> </a>
+</h3>
+<p>LSTMs or the Long Short Term Memory have been around for a long time and there are many resources that do a great job in explaining the concept and its working in detail. So why another blog post? Multiple reasons. First, as a personal resource. I have read many blog posts on LSTMs and most of the times the same ones simply because I tend to forget the details after sometime. Clearly, my brain cannot handle <em>long-term dependencies</em>. Second, I am trying to put a lot of details in this post. I have come across blogs that explain LSTMs with the help of equations, some do it with text only and some with animations (hands down the best ones). In this post, I have attempted to include explanations for each component,  equations, figures and an implementation of the LSTM layer from scratch. I hope this helps everyone get a wholesome understanding of the topic.</p>
+<h3 id="Recurrent-Neural-Nets">
+<a class="anchor" href="#Recurrent-Neural-Nets" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recurrent Neural Nets<a class="anchor-link" href="#Recurrent-Neural-Nets"> </a>
+</h3>
+<p>RNNs are one of the key flavours of deep neural networks. Unlike artificial neural networks that have multiple layers of neurons stacked one after another, it is not easily evident as to how recurrent nets are deep. Below is the figure of a rolled RNN. 
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from&lt;em&gt;nb/images/rnn.JPG" alt="">
+    
+    
+</figure>
+<br>
+The input $x&lt;/em&gt;{t}$ is processed by the RNN for each time-step t and outputs a hidden state that captures and maintains the information of all the previous time-steps. We'll see this again as a <code>for</code> loop when we implement an LSTM layer. This <code>for</code> loop is exactly what makes RNNs deep. The unrolled version of the network is more widely used in literature and is shown below:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/unrolled.PNG" alt="">
+    
+    
+</figure>
+<br>
+This deep nature is precisely the reason why such networks cannot <em>practically</em> model long-term dependencies. As the length of the input sequence increases, the number of matrix multiplications within the network increase. The weight updates of the earlier layers suffer as the gradients tend to vanish for them. Intuitively, think of this as multiplying a number less than zero with itself. The values become low exponentially. On the other hand if gradient values are larger than 1, these explode into large numbers that the computer can no longer make sense of. Consider this for intuition:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/grads.png" alt="">
+    
+    
+</figure>
+<br>
+To deal with such issues, we need a mechanism that enables the networks to forget the irrelevant information and hold on to the relevant one. Enter LSTMs.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Understanding-the-LSTM-cell">
+<a class="anchor" href="#Understanding-the-LSTM-cell" aria-hidden="true"><span class="octicon octicon-link"></span></a>Understanding the LSTM cell<a class="anchor-link" href="#Understanding-the-LSTM-cell"> </a>
+</h2>
+<p>Before we get into the abstract details of the LSTM, it is important to understand what the black box actually contains. The LSTM cell is nothing but a pack of 3-4 mini neural networks. These networks are comprised of linear layers that are parameterized by weight matrices and biases. The values of these weights are learnt by backpropagation. 
+The following figure shows an LSTM cell with labelled gates and all the computations that take place inside the cell. Each cell has 3 inputs: the current token $x_{t}$, previous hidden state $h_{t-1}$ and the previous cell state $c_{t-1}$ and 2 outputs: the updated hidden state $h_{t}$ and cell state $c_{t}$.
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/lstm_cell.PNG" alt="">
+    
+    
+</figure>
+</p>
+<h3 id="The-forget-gate">
+<a class="anchor" href="#The-forget-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>The forget gate<a class="anchor-link" href="#The-forget-gate"> </a>
+</h3>
+<p>This gate takes in the current input $x_{t}$ and the previous hidden state $h_{t-1}$, multiplies them with a weight matrix of the forget gate $W_{f}$ (also adds a bias $b_{f}$) and applies a sigmoid activation. From an implementational point of view, $W_{f}$ and $b_{f}$ are the values associated with a simple linear layer. 
+The sigmoid function restricts the input values between 0 and 1. This output is then multiplied with the cell state. Intuitively, given the current input this gate tells the cell to remove or forget some information if the sigmoid output is close to 0 and keep the information if the sigmoid output is close to 1.
+The equation for this gate is:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/fgate.PNG" alt="">
+    
+    
+</figure>
+</p>
+<h3 id="The-input-and-the-cell-gate">
+<a class="anchor" href="#The-input-and-the-cell-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>The input and the cell gate<a class="anchor-link" href="#The-input-and-the-cell-gate"> </a>
+</h3>
+<p>The input gate is used to decide that given the current input what information is important and should be stored in the cell state. The calculations of this gate are similar to those of the forget gate.
+The cell gate and the input gate work closely together to perform a very specific function. This function is to update the previous cell state. To do so, the cell gate proposes an update candidate. You can think of this update candidate as a proposed new cell state. To calculate the cell gate output, a <code>tanh</code> activation is used (more on this later). The equation for the cell state is:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/igate.PNG" alt="">
+    
+    
+</figure>
+</p>
+<h3 id="Cell-update">
+<a class="anchor" href="#Cell-update" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cell update<a class="anchor-link" href="#Cell-update"> </a>
+</h3>
+<p>We cannot simply replace the new proposed cell state and eliminate the previous cell state. This is because the previous state might contain some important information about the previous inputs the LSTM layer has seen. This is basically the main purpose of recurrent networks - to hold on to relevant information from the past. Hence, we adopt a very elegant approach to update the cell state.<br>
+From the previous blocks, we know the following:<br>
+Given the current input, the forget gate decides what information from the previous cell state can be forgotten. This is done by multiplying the forget gate output $f_{t}$ with the previous cell state $c_{t-1}$. Also, the input gate determines what information from the current input is relevant. Product of $i_{t}$ and the proposed cell state would give us important parts from the proposed cell state. We thus combine these two to yeild the following cell update equation:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/cgate.PNG" alt="">
+    
+    
+</figure>
+</p>
+<h3 id="Output-gate">
+<a class="anchor" href="#Output-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Output gate<a class="anchor-link" href="#Output-gate"> </a>
+</h3>
+<p>This gate is used to calculate the hidden state for the next time step. Again the current input $x_{t}$ and previous hidden state $h_{t-1}$ are multiplied by a weight matrix $W_{o}$ and passed through sigmoid activation. To update the hidden state of the cell, it might be a good idea to incorporate some information from the newly updated cell state. Therefore, the result of the output gate $o_{t}$ is multiplied with the updated cell state $c_{t}$ after passing $c_{t}$ through tanh activation (explained later). The equation for this gate is:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/ogate.PNG" alt="">
+    
+    
+</figure>
+</p>
+<h3 id="Why-do-we-use-tanh-for-calculating-cell-state?">
+<a class="anchor" href="#Why-do-we-use-tanh-for-calculating-cell-state?" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Why do we use tanh for calculating cell state?</em><a class="anchor-link" href="#Why-do-we-use-tanh-for-calculating-cell-state?"> </a>
+</h3>
+<p>We left this part rather abruptly while talking about the cell gate. The question of as to why tanh has been preferred over sigmoid and even ReLU has been a hotly debated one. My research led me to multiple sources and reasons.</p>
+<ul>
+<li>One of the key reasons as to why tanh is preferred is its range [-1, 1] and the fact that it is zero-centered. These properties enable the neural net to converge faster and hence train faster. Yann LeCun in his paper called Efficient BackProp explains such factors that affect the backpropagation algorithm in neural networks. To understand this consider the following. Assume that all the values in a weight matrix are positive. These weights are updated during backprop by say a factor <em>d</em> which can be positive or negative. As a result, these weights can only all decrease or all increase <em>together</em> for a given input pattern. Thus, if a weight vector must change direction it can only do so by zigzagging which is inefficient and thus very slow.  </li>
+<li>Another reason for using tanh is the relatively larger value of its derivative. Backprop computations result in multiplication of derivatives of the activation function multiple times depending upon the number of layers in the network. The maximum value for the derivative of a sigmoid function is 0.25 whereas that for tanh is 1. Hence, if the network is reasonably deep, the gradients of sigmoid are more likely to vanish than those of tanh.
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/tanh.PNG" alt="">
+    
+    
+</figure>
+ <img src="images/sig.PNG" style="width:450px;height:250px">
+</li>
+</ul>
+<h3 id="Why-do-we-use-tanh-while-calculating-output-gate-values?">
+<a class="anchor" href="#Why-do-we-use-tanh-while-calculating-output-gate-values?" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Why do we use tanh while calculating output gate values?</em><a class="anchor-link" href="#Why-do-we-use-tanh-while-calculating-output-gate-values?"> </a>
+</h3>
+<p>Although this is not that important but in case this question comes to your head, here's the answer. If you carefully look at the cell update equations, we have already applied a tanh activation in order to calculate the cell update candidate. Yet we again pass the cell state through tanh to get the new hidden state $h_{t}$. This is done to ensure that the values of $h_{t}$ lie between -1 and 1 because there's a chance that the values of the updated cell state $c_{t}$ might have exceeded 1 in previous additive computation.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Implementation">
+<a class="anchor" href="#Implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation<a class="anchor-link" href="#Implementation"> </a>
+</h2>
+<ul>
+<li>As pointed out earlier, the LSTM cell is a collection of 4 neural nets. In order to parallelize our computations and make use of a GPU it is better to compute values of the gates all at once. We need to linear layers: one for the current input and one for the previous hidden state. </li>
+<li>So in the init method we initialize two linear layers. The <code>out_features</code> value for both these layers is 4 * hidden_dim owing to the number of gates. </li>
+<li>You can relate this implementation with the equations above by expanding the multiplication of weights with the inputs. Assume that the weights associated with these layers are $W'_{i}$ for current input and $W'_{h}$ for previous hidden state. We perform the following computation initially and then break this computation into 4 matrices, one for each gate.  </li>
+</ul>
+<p><strong><em>W</em> = $W'_{i}$ $*$ $x_{t}$ + $W'_{h}$ $*$ $h_{t-1}$ + $b'_{i}$ + $b'_{h}$</strong></p>
+<ul>
+<li>The <em>W</em> matrix gets divided into 4 equal tensors $W_{i}$,  $W_{f}$,  $W_{c}$,  $W_{o}$ which have been used in the equations above. This split is performed using <a href="https://pytorch.org/docs/stable/torch.html?highlight=chunk#torch.chunk">torch.chunk</a>. </li>
+</ul>
+<p>The rest of the code for LSTM cell is just converting the equations to code.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">LSTMCell</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">hidden_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">hidden_dim</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_input</span><span class="p">,</span> <span class="n">previous_state</span><span class="p">):</span>
+        
+        <span class="n">previous_hidden_state</span><span class="p">,</span> <span class="n">previous_cell_state</span> <span class="o">=</span> <span class="n">previous_state</span>
+        
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span><span class="p">(</span><span class="n">current_input</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layer</span><span class="p">(</span><span class="n">previous_hidden</span><span class="p">)</span>
+        
+        <span class="n">gates</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    
+        <span class="n">input_gate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">gates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">forget_gate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">gates</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">output_gate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">gates</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="n">cell_gate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">gates</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        
+        <span class="n">new_cell</span> <span class="o">=</span> <span class="p">(</span><span class="n">forget_gate</span> <span class="o">*</span> <span class="n">previous_cell_state</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">input_gate</span> <span class="o">*</span> <span class="n">cell_gate</span><span class="p">)</span>
+        <span class="n">new_hidden</span> <span class="o">=</span> <span class="n">output_gate</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">new_cell</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">new_hidden</span><span class="p">,</span> <span class="p">(</span><span class="n">new_hidden</span><span class="p">,</span> <span class="n">new_cell</span><span class="p">)</span>
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The following snippet basically takes an LSTMCell instance and calculates the output for the input sequence by applying a for loop. This is the same loop we had talked about initially in the post.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">LSTMLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="o">*</span><span class="n">cell_args</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell</span> <span class="o">=</span> <span class="n">cell</span><span class="p">(</span><span class="o">*</span><span class="n">cell_args</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        
+        <span class="n">inputs</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)):</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">state</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">output</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">state</span>
+        
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lstm</span> <span class="o">=</span> <span class="n">LSTMLayer</span><span class="p">(</span><span class="n">LSTMCell</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Acknowledgements-and-References">
+<a class="anchor" href="#Acknowledgements-and-References" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgements and References<a class="anchor-link" href="#Acknowledgements-and-References"> </a>
+</h2>
+<p>This blog post is merely a combination of a variety of great resources available on the internet. The code is heavily drawn from the fastai foundations notebook by Jeremy Howard who does a great job in explaining the inner workings of each component. Figures are majorly taken from Chris Olah's evergreen post on LSTMs. All the references and links have been listed below to the best of my knowledge. Thank you!</p>
+<ol>
+<li><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">https://colah.github.io/posts/2015-08-Understanding-LSTMs/</a></li>
+<li><a href="https://github.com/fastai">https://github.com/fastai</a></li>
+<li><a href="https://github.com/emadRad/lstm-gru-pytorch/blob/master/lstm_gru.ipynb">https://github.com/emadRad/lstm-gru-pytorch/blob/master/lstm_gru.ipynb</a></li>
+<li><a href="https://towardsdatascience.com/illustrated-guide-to-lstms-and-gru-s-a-step-by-step-explanation-44e9eb85bf21">https://towardsdatascience.com/illustrated-guide-to-lstms-and-gru-s-a-step-by-step-explanation-44e9eb85bf21</a></li>
+<li><a href="https://towardsdatascience.com/derivative-of-the-sigmoid-function-536880cf918e">https://towardsdatascience.com/derivative-of-the-sigmoid-function-536880cf918e</a></li>
+<li><a href="https://www.researchgate.net/figure/5-Activation-functions-in-comparison-Red-curves-stand-for-respectively-sigmoid_fig10_317679065">https://www.researchgate.net/figure/5-Activation-functions-in-comparison-Red-curves-stand-for-respectively-sigmoid_fig10_317679065</a></li>
+<li><a href="https://stats.stackexchange.com/questions/368576/why-do-we-need-second-tanh-in-lstm-cell">https://stats.stackexchange.com/questions/368576/why-do-we-need-second-tanh-in-lstm-cell</a></li>
+<li><a href="https://www.quora.com/In-an-LSTM-unit-what-is-the-reason-behind-the-use-of-a-tanh-activation">https://www.quora.com/In-an-LSTM-unit-what-is-the-reason-behind-the-use-of-a-tanh-activation</a></li>
+<li><a href="https://stackoverflow.com/questions/40761185/what-is-the-intuition-of-using-tanh-in-lstm">https://stackoverflow.com/questions/40761185/what-is-the-intuition-of-using-tanh-in-lstm</a></li>
+<li><a href="https://stats.stackexchange.com/questions/101560/tanh-activation-function-vs-sigmoid-activation-function">https://stats.stackexchange.com/questions/101560/tanh-activation-function-vs-sigmoid-activation-function</a></li>
+<li><a href="https://stats.stackexchange.com/questions/330559/why-is-tanh-almost-always-better-than-sigmoid-as-an-activation-function">https://stats.stackexchange.com/questions/330559/why-is-tanh-almost-always-better-than-sigmoid-as-an-activation-function</a></li>
+<li><a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf">http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf</a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kushalj001/black-box-ml"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/black-box-ml/lstm/pytorch/gates/vanishing%20gradient/2019/12/28/Understanding-LSTMs.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/black-box-ml/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/black-box-ml/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/black-box-ml/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>All models are bad, some are useful.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

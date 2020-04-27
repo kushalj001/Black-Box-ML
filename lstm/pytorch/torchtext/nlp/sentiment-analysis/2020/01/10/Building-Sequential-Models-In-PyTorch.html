@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Building Sequential Models in PyTorch | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Building Sequential Models in PyTorch" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Build a sentiment analysis model using PyTorch and torchText" />
+<meta property="og:description" content="Build a sentiment analysis model using PyTorch and torchText" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-01-10T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"Build a sentiment analysis model using PyTorch and torchText","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html","headline":"Building Sequential Models in PyTorch","dateModified":"2020-01-10T00:00:00-06:00","datePublished":"2020-01-10T00:00:00-06:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Building Sequential Models in PyTorch | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Building Sequential Models in PyTorch" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Build a sentiment analysis model using PyTorch and torchText" />
+<meta property="og:description" content="Build a sentiment analysis model using PyTorch and torchText" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-01-10T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"Build a sentiment analysis model using PyTorch and torchText","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html","headline":"Building Sequential Models in PyTorch","dateModified":"2020-01-10T00:00:00-06:00","datePublished":"2020-01-10T00:00:00-06:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/black-box-ml/">Black Box ML</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/black-box-ml/about/">About Me</a><a class="page-link" href="/black-box-ml/search/">Search</a><a class="page-link" href="/black-box-ml/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Building Sequential Models in PyTorch</h1><p class="page-description">Build a sentiment analysis model using PyTorch and torchText</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-01-10T00:00:00-06:00" itemprop="datePublished">
+        Jan 10, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      14 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#lstm">lstm</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#pytorch">pytorch</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#torchtext">torchtext</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#NLP">NLP</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#sentiment-analysis">sentiment-analysis</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-01-10-Building-Sequential-Models-In-PyTorch.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-01-10-Building-Sequential-Models-In-PyTorch.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-01-10-Building-Sequential-Models-In-PyTorch.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Introduction">Introduction </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#A-Tensor-based-approach">A Tensor based approach </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#A-short-Introduction-to-NLP-pipeline">A short Introduction to NLP pipeline </a></li>
+<li class="toc-entry toc-h2"><a href="#TorchText-basics">TorchText basics </a></li>
+<li class="toc-entry toc-h2"><a href="#Implementing-the-model">Implementing the model </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Embedding-layer-(nn.Embedding)">Embedding layer (nn.Embedding) </a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#Parameters">Parameters </a></li>
+<li class="toc-entry toc-h4"><a href="#Inputs-and-outputs">Inputs and outputs </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h3"><a href="#LSTM-Layer-(nn.LSTM)">LSTM Layer (nn.LSTM) </a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#Parameters">Parameters </a></li>
+<li class="toc-entry toc-h4"><a href="#Inputs">Inputs </a></li>
+<li class="toc-entry toc-h4"><a href="#Outputs">Outputs </a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Training-the-model">Training the model </a></li>
+<li class="toc-entry toc-h2"><a href="#References-and-Acknowledgements">References and Acknowledgements </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-01-10-Building-Sequential-Models-In-PyTorch.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">
+<a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
+</h2>
+<p>The aim of this post is to enable beginners to get started with building sequential models in PyTorch. PyTorch is one of the most widely used deep learning libraries and is an extremely popular choice among researchers due to the amount of control it provides to its users and its <em>pythonic</em> layout. I am writing this primarily as a resource that I can refer to in future. This post will help in brushing up all the basics of PyTorch and also provide a detailed explanation of how to use some important torch.nn modules.<br>
+We will be implementing a common NLP task - sentiment analysis using PyTorch and torchText. We will be building an LSTM network for the task by using the IMDB dataset. Let's get started!</p>
+<h3 id="A-Tensor-based-approach">
+<a class="anchor" href="#A-Tensor-based-approach" aria-hidden="true"><span class="octicon octicon-link"></span></a>A Tensor based approach<a class="anchor-link" href="#A-Tensor-based-approach"> </a>
+</h3>
+<p>Another motivation to write this post is to introduce neural nets from tensors' persepective. Neural nets are, ultimately, a series of matrix/tensor multiplications. Each layer in a neural net expects an input in a specified format and gives the output in a specified format. These input and output formats are tensors of different shapes. The content of these tensors are well defined by the documentation of the concerned library. As such, while implementing neural nets, it becomes very important to understand the input and output shapes of tensors for all layers. The following tutorial is written based on this approach.</p>
+<h2 id="A-short-Introduction-to-NLP-pipeline">
+<a class="anchor" href="#A-short-Introduction-to-NLP-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>A short Introduction to NLP pipeline<a class="anchor-link" href="#A-short-Introduction-to-NLP-pipeline"> </a>
+</h2>
+<p>I do not intend to go into details about all the preprocessing steps that are required for NLP tasks but for the sake of completeness, I'll summarize some important conceptual points.</p>
+<ul>
+<li>Textual data usually requires some amount of cleaning before they can be fed to neural nets. Important cleaning steps include removal of HTML tags, punctuation, stopwords, numbers etc. Stopwords are high frequency words in a dataset that do not convey significant information to the network (e.g. and, of, the, a).</li>
+<li>Lemmatization can be performed to improve results of the network. Lemmatization converts words to their root form or to their lemma which can be found in a dictionary. For example "goes" $-&gt;$ "go".</li>
+<li>Neural nets do not understand natural language. In fact the only thing they understand and can process are numbers. So for any NLP task, we need to convert out text data into a numerical format (numericalization). Each word in the dataset is assigned a numerical value. These words need to be represented as a vector.</li>
+<li>There are two options to represent a word or a token as a feature vector.  <ol>
+<li>One-hot encoding: Here, the size of the feature vector equals that of the vocabulary of dataset. All the values are 0 except for the index that equals the numerical value of the word.  </li>
+<li>Embeddings: These can either be pre-trained(GloVe, word2vec) or be trained in parallel with the main task. The dimensions of such vectors are usually around 100-300. These transform the features of the word into a dense vector.</li>
+</ol>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="TorchText-basics">
+<a class="anchor" href="#TorchText-basics" aria-hidden="true"><span class="octicon octicon-link"></span></a>TorchText basics<a class="anchor-link" href="#TorchText-basics"> </a>
+</h2>
+<p>Some key points about the structure of the library will serve as a good introduction and also help in following along the rest of the tutorial.</p>
+<p>The most important class of torchtext is the <code>Field</code> class. The structure of datasets for different NLP tasks is different. For example, in a classification task we have text reviews that are sequential in nature and a sentiment label corresponding to each review which is binary in nature (+ or -). In machine translation or summarization, both the input and output are sequential. The <code>Field</code> class handles all such types of datasets. Therefore, we initialize <code>Field</code> objects for each type of data format present in our dataset.</p>
+<p>In sentiment analysis we need two <code>Field</code> instances - one for text review and other for labels. For labels we use <code>LabelField</code> which inherits from <code>Field</code>. Following are some important parameters you might need while initializing a Field class.</p>
+<ul>
+<li>
+<code>tokenize</code>   : function used to tokenize the text. This can either be a custom function or passing 'spacy' uses the    SpaCy tokenizer.</li>
+<li>
+<code>init_token</code> : prepends this token in the beginning of each example. e.g. &lt; sos &gt;.</li>
+<li>
+<code>eos_token</code>  : appends this token in the end of each example. e.g. &lt; eos &gt;.</li>
+<li>
+<code>fix_length</code> : fixed, predefined length to which all the examples in field will be padded.</li>
+<li>
+<code>batch_first</code>: gives data in tensors that have batch dimension as the first dimension.  </li>
+</ul>
+<p>Some important methods:</p>
+<ul>
+<li>
+<code>pad()</code> :  This method pads the examples to <code>fix_length</code> if provided as a parameter. If not, it calculates the length of the largest example in a batch and pads the sequences to that length.</li>
+<li>
+<code>build_vocab()</code>: The Field class holds an instance of Vocab class. This class is responsible for creating a vocabulary from the field data and creating mappings stoi (string to int) and itos (int to string) for each word.</li>
+</ul>
+<p>To summarize, the Field class numericalizes the text data and provides it in form of tensors so that they can be used easily with neural nets.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torchtext</span>
+<span class="kn">from</span> <span class="nn">torchtext</span> <span class="kn">import</span> <span class="n">data</span><span class="p">,</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># creating field objects for text and labels </span>
+<span class="n">review</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">tokenize</span><span class="o">=</span><span class="s1">'spacy'</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sentiment</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">LabelField</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># loading the IMDB dataset</span>
+<span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">IMDB</span><span class="o">.</span><span class="n">splits</span><span class="p">(</span><span class="n">text_field</span><span class="o">=</span><span class="n">review</span><span class="p">,</span> <span class="n">label_field</span><span class="o">=</span><span class="n">sentiment</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">examples</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{'text': ['This', 'is', 'not', 'the', 'typical', 'Mel', 'Brooks', 'film', '.', 'It', 'was', 'much', 'less', 'slapstick', 'than', 'most', 'of', 'his', 'movies', 'and', 'actually', 'had', 'a', 'plot', 'that', 'was', 'followable', '.', 'Leslie', 'Ann', 'Warren', 'made', 'the', 'movie', ',', 'she', 'is', 'such', 'a', 'fantastic', ',', 'under', '-', 'rated', 'actress', '.', 'There', 'were', 'some', 'moments', 'that', 'could', 'have', 'been', 'fleshed', 'out', 'a', 'bit', 'more', ',', 'and', 'some', 'scenes', 'that', 'could', 'probably', 'have', 'been', 'cut', 'to', 'make', 'the', 'room', 'to', 'do', 'so', ',', 'but', 'all', 'in', 'all', ',', 'this', 'is', 'worth', 'the', 'price', 'to', 'rent', 'and', 'see', 'it', '.', 'The', 'acting', 'was', 'good', 'overall', ',', 'Brooks', 'himself', 'did', 'a', 'good', 'job', 'without', 'his', 'characteristic', 'speaking', 'to', 'directly', 'to', 'the', 'audience', '.', 'Again', ',', 'Warren', 'was', 'the', 'best', 'actor', 'in', 'the', 'movie', ',', 'but', '"', 'Fume', '"', 'and', '"', 'Sailor', '"', 'both', 'played', 'their', 'parts', 'well', '.'], 'label': ['pos']}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># dividing the training set further into a train and validation set</span>
+<span class="n">train_data</span><span class="p">,</span> <span class="n">valid_data</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># some important parameters</span>
+<span class="n">VOCAB_SIZE</span> <span class="o">=</span> <span class="mi">25000</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">'cuda'</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">'cpu'</span><span class="p">)</span>
+<span class="c1"># build vocabulary for the fields</span>
+<span class="n">review</span><span class="o">.</span><span class="n">build_vocab</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="n">VOCAB_SIZE</span><span class="p">)</span>
+<span class="n">sentiment</span><span class="o">.</span><span class="n">build_vocab</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+
+<span class="c1"># create iterators for the dataset. iterators enable looping through the dataset easily</span>
+<span class="n">train_iterator</span><span class="p">,</span> <span class="n">valid_iterator</span><span class="p">,</span> <span class="n">test_iterator</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">BucketIterator</span><span class="o">.</span><span class="n">splits</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">valid_data</span><span class="p">,</span> <span class="n">test_data</span><span class="p">),</span> 
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span><span class="p">,</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">train_iterator</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>torch.Size([64, 1201])
+torch.Size([64])
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Implementing-the-model">
+<a class="anchor" href="#Implementing-the-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementing the model<a class="anchor-link" href="#Implementing-the-model"> </a>
+</h2>
+<p>Let's begin by understanding the layers that are going to be used in this model. We need to know 3 things about each layer in PyTorch -</p>
+<ul>
+<li>parameters : used to instantiate the layer. These are the keyword args required to create an object of the class.</li>
+<li>inputs : tensors passed to instantiated layer during <code>model.forward()</code> call</li>
+<li>outputs : output of the layer</li>
+</ul>
+<h3 id="Embedding-layer-(nn.Embedding)">
+<a class="anchor" href="#Embedding-layer-(nn.Embedding)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Embedding layer (nn.Embedding)<a class="anchor-link" href="#Embedding-layer-(nn.Embedding)"> </a>
+</h3>
+<p>This layer acts as a lookup table or a matrix which maps each token to its embedding or feature vector. This module is often used to store word embeddings and retrieve them using indices.</p>
+<h4 id="Parameters">
+<a class="anchor" href="#Parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters<a class="anchor-link" href="#Parameters"> </a>
+</h4>
+<ul>
+<li>num_embeddings: size of vocabulary of the dataset. Number of words in the vocab.</li>
+<li>embedding_dim : size of embedding vector for each word. 300 for word2vec. Each word will be mapped to a 300 (say) dimensional vector</li>
+</ul>
+<h4 id="Inputs-and-outputs">
+<a class="anchor" href="#Inputs-and-outputs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inputs and outputs<a class="anchor-link" href="#Inputs-and-outputs"> </a>
+</h4>
+<p>Embedding layer can accept tensors of aribitary shape, denoted by <code>[ * ]</code> and the output tensor's shape is <code>[ * ,H]</code>, where H is the embedding dimension of the layer. For example in case of sentiment analysis, the input will be of shape <code>[batch_size, seq_len]</code> and the output shape will be <br> <code>[ batch_size, seq_len, embedding_dim ]</code>. Intuitively, it replaces each word of each example in the batch by an embedding vector.</p>
+<h3 id="LSTM-Layer-(nn.LSTM)">
+<a class="anchor" href="#LSTM-Layer-(nn.LSTM)" aria-hidden="true"><span class="octicon octicon-link"></span></a>LSTM Layer (nn.LSTM)<a class="anchor-link" href="#LSTM-Layer-(nn.LSTM)"> </a>
+</h3>
+<h4 id="Parameters">
+<a class="anchor" href="#Parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters<a class="anchor-link" href="#Parameters"> </a>
+</h4>
+<ul>
+<li>input_size : The number of expected features in input. This means the dimension of the feature vector that will be input to an LSTM unit. For most NLP tasks, this is the <code>embedding_dim</code> because the words which are the input are represented by a vector of size <code>embedding_dim</code>.</li>
+<li>hidden_size : Number of features you want the LSTM to learn about the pattern of your data.</li>
+<li>num_layers : Number of layers in the LSTM network. If <code>num_layers</code> = 2, it means that you're stacking 2 LSTM layers. The input to the first LSTM layer would be the output of embedding layer whereas the input for second LSTM layer would be the output of first LSTM layer.</li>
+<li>batch_first : If <code>True</code> then the input and output tensors are provided as <code>(batch_size, seq_len, feature)</code>.</li>
+<li>dropout : If provided, applied between consecutive LSTM layers except the last layer.</li>
+<li>bidirectional : If <code>True</code>, it becomes a bidirectional LSTM. That is it reads the sequence from both the directions. The forward direction starts from $x_{0}$ and goes till $x_{n}$ and backward direction goes from $x_{n}$ to $x_{0}$.</li>
+</ul>
+<p><code>seq_len</code> mentioned above is the length of the input sentence. This will be the same for all the examples within a single batch.
+For the rest of this post we are going to take <code>batch_first</code> = <code>True</code></p>
+<h4 id="Inputs">
+<a class="anchor" href="#Inputs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inputs<a class="anchor-link" href="#Inputs"> </a>
+</h4>
+<ul>
+<li>input : Shape of tensor is <code>[batch_size, seq_len input_size]</code> if <code>batch_first = True</code>. This is usually the output from the embedding layer for most NLP tasks. </li>
+<li>h_0 : <code>[batch_size, num_layers * num_directions, hidden_size]</code> Tensor containing initial hidden state for each element in batch.</li>
+<li>c_0 : <code>[batch_size, num_layers * num_directions, hidden_size]</code> Tensor containing initial cell state for each element in batch.</li>
+</ul>
+<h4 id="Outputs">
+<a class="anchor" href="#Outputs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Outputs<a class="anchor-link" href="#Outputs"> </a>
+</h4>
+<ul>
+<li>output : <code>[batch_size, seq_len, num_directions * hidden_size]</code> Tensor containing the output features (h_t) from the last layer of the LSTM, for each t. </li>
+<li>h_n : <code>[num_layers * num_directions, batch, hidden_size]</code>: tensor containing the hidden state for t = seq_len.</li>
+<li>c_n : <code>[num_layers * num_directions, batch, hidden_size]</code>: tensor containing the cell state for t = seq_len.</li>
+</ul>
+<p>Understanding the outputs of the LSTM can be a bit difficult initially. The following diagram clearly explains what each of the outputs mean. 
+The following figure shows a general case of LSTM implementation. 
+<figure>
+  
+    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/lstmpt.PNG" alt="">
+    
+    
+</figure>
+</p>
+<ul>
+<li>The horizontal axis or the time axis determines the sequence length or the inputs at various time-steps. The vertical axis determines how many LSTM layers have been stacked together. Beginning from the first layer at the bottom, adding each layer increases the depth of the network. The number of layers are denoted by <code>w</code> in this figure.   </li>
+<li>As evident, for each time-step t the LSTM unit takes in $h_{t-1}$, $c_{t-1}$ and $x_{t}$ and gives $h_{t}$  and $c_{t}$. The newly calculated $h_{t}$ and $c_{t}$ are passed to next LSTM unit as hidden and cell state of the sequnce seen so far. Simultaneously $h_{t}$ is also passed as the <strong>output</strong> for that time-step. This is used as the input for stacked layers above the current layer and finally to calculate predictions. Therefore the <code>output</code> of LSTM layer actually contains the hidden states of all time-steps passed through all the layers. Basically, it holds ( $h^{w}_{1}$, $h^{w}_{2}$,  ... $h^{w}_{n}$).  </li>
+<li>The final hidden and cell states denoted by $h_{n}$ and $c_{n}$ for all the layers are stacked in <code>(h_n, c_n)</code> output of the LSTM layer. Therefore <code>(h_n, c_n)</code> hold (($h^{1}_{n}$,  $c^{1}_{n}$) ,  ($h^{2}_{n}$,  $c^{2}_{n}$) ... ($h^{w}_{n}$,  $c^{w}_{n}$)) where <code>w</code> is number of layers stacked in the LSTM.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INPUT_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">review</span><span class="o">.</span><span class="n">vocab</span><span class="p">)</span>
+<span class="n">HIDDEN_SIZE</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">EMBEDDING_DIM</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">DROPOUT</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">NUM_LAYERS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">BIDIRECTIONAL</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">OUTPUT_DIM</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">SentimentLSTM</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">num_embeddings</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="o">=</span><span class="n">embedding_dim</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">,</span>
+                            <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">output_dim</span><span class="p">)</span>
+        
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+        <span class="c1"># x = [batch_size, seq_len] = [64, seq_len] as seq_len depends on the batch. </span>
+        
+        <span class="n">embed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        
+        <span class="c1"># embed = [batch_size, seq_len, embedding_dim] = [64, seq_len, 100]</span>
+        
+        <span class="c1"># These can be intuitively interpreted as: each example in the batch </span>
+        <span class="c1"># has a length of seq_len and each word in the sequence is represented</span>
+        <span class="c1"># by a vector of size 100.</span>
+        
+        <span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">cell</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">embed</span><span class="p">)</span>
+        
+        <span class="c1"># output = [batch_size, seq_len, hidden_size] = [64, seq_len, 128]</span>
+        <span class="c1"># hidden = [num_layers*num_directions, batch_size, hidden_size] = [1, 64, 128]</span>
+        <span class="c1"># cell = [num_layers*num_directions, batch_size, hidden_size] = [1, 64, 128]</span>
+        
+        <span class="c1"># output is the concatenation of the hidden state from every time step, </span>
+        <span class="c1"># whereas hidden is simply the final hidden state. </span>
+        <span class="c1"># We verify this using the assert statement. </span>
+        
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="c1"># hidden = [1, 64, 128]</span>
+        <span class="c1"># output = [seq_len, 64, 128]</span>
+        
+        <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,:],</span> <span class="n">hidden</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+     
+        <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,:])</span>
+        
+        <span class="c1"># preds = [64, 1]</span>
+        
+        <span class="k">return</span> <span class="n">preds</span>
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SentimentLSTM</span><span class="p">(</span><span class="n">INPUT_SIZE</span><span class="p">,</span> <span class="n">HIDDEN_SIZE</span><span class="p">,</span> <span class="n">EMBEDDING_DIM</span><span class="p">,</span> <span class="n">DROPOUT</span><span class="p">,</span> <span class="n">NUM_LAYERS</span><span class="p">,</span> <span class="n">OUTPUT_DIM</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-the-model">
+<a class="anchor" href="#Training-the-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training the model<a class="anchor-link" href="#Training-the-model"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A basic training loop involves the following steps</p>
+<ul>
+<li>
+<code>forward</code> pass, i.e. multiplication of inputs with randomly initialized weights and carrying this on for all the layers.</li>
+<li>calculate the <code>loss</code> of the predictions with the given target/ground truth.</li>
+<li>calculate the gradient of the loss function and propagate it <code>backwards</code> to calculate gradients of all the layers</li>
+<li>
+<code>updating</code> the weights of all the layers using the gradients so that the objective/loss function converges </li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">''' Returns accuracy of the model.'''</span>
+    
+    <span class="n">rounded_preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">preds</span><span class="p">))</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="p">(</span><span class="n">rounded_preds</span> <span class="o">==</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="n">acc</span> <span class="o">=</span> <span class="n">correct</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">correct</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">acc</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># define the loss function</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()</span>
+<span class="c1"># determine the gradient descent algorithm to be used for updating weights</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># put model and loss on GPU</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The following function performs the training and evaluation simultaneously. Each line has been well documented.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_iterator</span><span class="p">,</span> <span class="n">valid_iterator</span><span class="p">):</span>
+    
+    <span class="c1"># define number of epochs</span>
+    <span class="n">epochs</span> <span class="o">=</span> <span class="mi">3</span>
+    
+    <span class="c1"># go through each epoch</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>  
+        <span class="c1"># put the model in training mode</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>   
+        <span class="c1"># initialize losses and accuaracy for every epoch</span>
+        <span class="n">train_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">train_acc</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">valid_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">valid_acc</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Epoch: "</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
+        
+        <span class="c1"># go through each batch from the dataset</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_iterator</span><span class="p">:</span>        
+            <span class="c1"># calculate model predictions. squeeze(1) is done because the output of model is [64,1].</span>
+            <span class="c1"># criterion expects it to be of dimension [64].</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+            <span class="c1"># calculate loss for the batch</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> 
+            <span class="c1"># add batch loss to total loss for the epoch</span>
+            <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="c1"># calculate accuracy for the batch</span>
+            <span class="n">train_acc</span> <span class="o">+=</span> <span class="n">accuracy</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch</span><span class="o">.</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="c1"># backward prop for loss function and calc gradients of all the layers in the net</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>    
+            <span class="c1"># update the weights   </span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>         
+            <span class="c1"># make the gradients zero before next step so that they don't accumulate</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>     
+            
+        <span class="c1"># print recorded results. Divide the total epoch loss/accuracy by the number of examples.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Training loss: '</span><span class="p">,</span><span class="n">train_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_iterator</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Training accuracy: '</span><span class="p">,</span> <span class="n">train_acc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_iterator</span><span class="p">))</span>
+        
+        <span class="c1"># put the model in evaluation mode</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="c1"># ensures that gradients are not calculated. Takes less time.</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="c1"># loop through the valid iterator</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">valid_iterator</span><span class="p">:</span>
+                <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                
+                <span class="n">valid_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">valid_acc</span> <span class="o">+=</span> <span class="n">accuracy</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch</span><span class="o">.</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Validation loss: '</span><span class="p">,</span> <span class="n">valid_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_iterator</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Validation accuracy: '</span><span class="p">,</span> <span class="n">valid_acc</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_iterator</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'-------------------------------------------------------------------------------'</span><span class="p">)</span>    
+                
+            
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_iterator</span><span class="p">,</span> <span class="n">valid_iterator</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch:  0
+Training loss:  0.6931361860602442
+Training accuracy:  0.5035274374659044
+Validation loss:  0.6933359392618729
+Validation accuracy:  0.4931585452819275
+-------------------------------------------------------------------------------
+Epoch:  1
+Training loss:  0.6932326938114027
+Training accuracy:  0.5008553832116789
+Validation loss:  0.693308207948329
+Validation accuracy:  0.4962040961293851
+-------------------------------------------------------------------------------
+Epoch:  2
+Training loss:  0.6932031631904797
+Training accuracy:  0.5027046403745665
+Validation loss:  0.6933137026883788
+Validation accuracy:  0.4962040961293851
+-------------------------------------------------------------------------------
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References-and-Acknowledgements">
+<a class="anchor" href="#References-and-Acknowledgements" aria-hidden="true"><span class="octicon octicon-link"></span></a>References and Acknowledgements<a class="anchor-link" href="#References-and-Acknowledgements"> </a>
+</h2>
+<ol>
+<li><a href="https://pytorch.org/docs/stable/nn.html">https://pytorch.org/docs/stable/nn.html</a></li>
+<li><a href="https://stackoverflow.com/questions/48302810/whats-the-difference-between-hidden-and-output-in-pytorch-lstm">https://stackoverflow.com/questions/48302810/whats-the-difference-between-hidden-and-output-in-pytorch-lstm</a></li>
+<li><a href="https://github.com/udacity/deep-learning-v2-pytorch">https://github.com/udacity/deep-learning-v2-pytorch</a></li>
+<li><a href="https://github.com/bentrevett">https://github.com/bentrevett</a></li>
+</ol>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kushalj001/black-box-ml"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/black-box-ml/lstm/pytorch/torchtext/nlp/sentiment-analysis/2020/01/10/Building-Sequential-Models-In-PyTorch.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/black-box-ml/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/black-box-ml/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/black-box-ml/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>All models are bad, some are useful.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
