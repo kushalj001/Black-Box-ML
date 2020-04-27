@@ -470,6 +470,13 @@ The following figure shows a general case of LSTM implementation.
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <ul>
 <li>The horizontal axis or the time axis determines the sequence length or the inputs at various time-steps. The vertical axis determines how many LSTM layers have been stacked together. Beginning from the first layer at the bottom, adding each layer increases the depth of the network. The number of layers are denoted by <code>w</code> in this figure.   </li>
 <li>As evident, for each time-step t the LSTM unit takes in $h_{t-1}$, $c_{t-1}$ and $x_{t}$ and gives $h_{t}$  and $c_{t}$. The newly calculated $h_{t}$ and $c_{t}$ are passed to next LSTM unit as hidden and cell state of the sequnce seen so far. Simultaneously $h_{t}$ is also passed as the <strong>output</strong> for that time-step. This is used as the input for stacked layers above the current layer and finally to calculate predictions. Therefore the <code>output</code> of LSTM layer actually contains the hidden states of all time-steps passed through all the layers. Basically, it holds ( $h^{w}_{1}$, $h^{w}_{2}$,  ... $h^{w}_{n}$).  </li>
