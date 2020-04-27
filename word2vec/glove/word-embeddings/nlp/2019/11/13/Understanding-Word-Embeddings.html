@@ -198,7 +198,7 @@ In this post, I intend to explain in detail the working of two techniques that h
 <p>The network is trained using word pairs from large text corpus. For each word in a sentence, we generate word pairs by looking at a fixed number of words before and after the current word (or the input word). This fixed number of words is also known as the window size. This can be 2, 3, 4 or 5. Window size of 3 means that we look at 3 words before and 3 words after the current word $w_{t}$. Which means the context words are ($w_{t-3}$, $w_{t-2}$, $w_{t-1}$, $w_{t+1}$, $w_{t+2}$, $w_{t+3}$). The word-pairs hence generated would be [($w_{t}$,$w_{t-3}$), ($w_{t}$,$w_{t-2}$), ...  ($w_{t}$,$w_{t+3}$)]. The word-pairs generated are used to train the network. That is, $w_{t}$ is given as input to the model and the output is one of the words from the context. 
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/w2v.PNG" alt="" style="max-width: 700px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/w2v.PNG" alt="" style="max-width: 700px">
     
     
 </figure>
@@ -213,7 +213,7 @@ In this post, I intend to explain in detail the working of two techniques that h
 <p>The model discussed above is the skip gram model in which we are predicting the context given the input. The authors also proposed another model in the same paper called continuous bag-of-words (CBOW) model where we predict the input word from the context. A schematic diagram for both these models as given in the paper is shown below
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/cbow.PNG" alt="" style="max-width: 700px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/cbow.PNG" alt="" style="max-width: 700px">
     
     
 </figure>
@@ -248,7 +248,7 @@ In this post, I intend to explain in detail the working of two techniques that h
 <p>Consider the sentence - "Winter is coming and it is here.". We construct a co-occurence matrix for this sentence with a context window size of 2. For "winter", the context words are "is" and "coming". Hence, we put 1 in the respective box. We also assume that the word itself is part of its context and hence increment the count in the diagonal of the matrix.<br>
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/couccmat.PNG" alt="" style="max-width: 800px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/couccmat.PNG" alt="" style="max-width: 800px">
     
     
 </figure>
@@ -272,7 +272,7 @@ In this post, I intend to explain in detail the working of two techniques that h
 <p>Consider the following calculations for a particular dataset. The following example will help us understand how can we derive meaning of words by the ratio of probabilities calculated above.</p>
 <p><figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from&lt;em&gt;nb/images/glovecomatrix.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from&lt;em&gt;nb/images/glovecomatrix.PNG" alt="">
     
     
 </figure>
@@ -289,7 +289,7 @@ Therefore, the hypothesis stated above is true in the sense that ratios of co-oc
 <li>Therefore, this seems to be a good starting point for learning word vectors. We need to learn a function $F$, parameterized by 3 word vectors $w_{i}$, $w_{j}$ and $\tilde w_{k}$ such that, 
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from&lt;em&gt;nb/images/gloveeq1.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from&lt;em&gt;nb/images/gloveeq1.PNG" alt="">
     
     
 </figure>
@@ -299,7 +299,7 @@ $w&lt;/em&gt;{i}$, $w<em>{j}$ and $\tilde w</em>{k}$ belong to $R^{ d}$. $\tilde
 The above discussion leads us to our first constraint. The most common way to compare two linear structures is to calculate their difference. Thus we can restrict our function as,
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq2.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq2.PNG" alt="">
     
     
 </figure>
@@ -309,7 +309,7 @@ The above discussion leads us to our first constraint. The most common way to co
 <p>In the above equation, the right hand side is a ratio which is scalar and the arguments are vectors. While, learning a complex function $F$ that does the above mapping is possible but that would introduce non-linearities in our model because that's what neural nets do. We don't wish to obscure the linear structure that our model captures. Therefore, we take a dot product of the arguments on the left hand side to make it a scalar. 
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq3.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq3.PNG" alt="">
     
     
 </figure>
@@ -332,7 +332,7 @@ F((w^{T}_{i} - w^{T}_{j})\tilde w_{k}) = F(w^{T}_{i}\tilde w_{k} + (-w^{T}_{j}\t
 \end{equation}<p>The above equation gives the following result,
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq4.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq4.PNG" alt="">
     
     
 </figure>
@@ -340,7 +340,7 @@ F((w^{T}_{i} - w^{T}_{j})\tilde w_{k}) = F(w^{T}_{i}\tilde w_{k} + (-w^{T}_{j}\t
 <p>The above equation is solved by equation $(3)$,
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq5.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq5.PNG" alt="">
     
     
 </figure>
@@ -348,7 +348,7 @@ F((w^{T}_{i} - w^{T}_{j})\tilde w_{k}) = F(w^{T}_{i}\tilde w_{k} + (-w^{T}_{j}\t
 <p>And the exponential function is the solution for equation $(4)$, therefore we have the following,
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq6.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq6.PNG" alt="">
     
     
 </figure>
@@ -356,7 +356,7 @@ F((w^{T}_{i} - w^{T}_{j})\tilde w_{k}) = F(w^{T}_{i}\tilde w_{k} + (-w^{T}_{j}\t
 <p>The symmetry is still not restored because of the $log(X_{i})$ term on the right hand side. Since, this term is independent of $k$, we can absorb it into bias $b_{i}$. Also introducing a bias $\tilde b_{k}$ for $\tilde w_{k}$, we finally have the following equation,<br>
 <figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq7.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq7.PNG" alt="">
     
     
 </figure>
@@ -364,7 +364,7 @@ F((w^{T}_{i} - w^{T}_{j})\tilde w_{k}) = F(w^{T}_{i}\tilde w_{k} + (-w^{T}_{j}\t
 <p>The above equation gives us a cost function for a new weighted least squares regression model. The weighting function $f(X_{ij})$ takes into consideration the co-occurrences of words.</p>
 <p><figure>
   
-    <img class="docimage" src="/black-box-ml-2/images/copied_from_nb/images/gloveeq8.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/gloveeq8.PNG" alt="">
     
     
 </figure>
