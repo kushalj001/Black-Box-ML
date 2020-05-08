@@ -189,7 +189,7 @@ window.onload = wrap_img;
 <p>RNNs are one of the key flavours of deep neural networks. Unlike artificial neural networks that have multiple layers of neurons stacked one after another, it is not easily evident as to how recurrent nets are deep. Below is the figure of a rolled RNN. 
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/rnn.JPG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/rnn.JPG" alt="" style="max-width: 200px">
     
     
 </figure>
@@ -204,7 +204,7 @@ window.onload = wrap_img;
 <p>The input $x_{t}$ is processed by the RNN for each time-step t and outputs a hidden state that captures and maintains the information of all the previous time-steps. We'll see this again as a <code>for</code> loop when we implement an LSTM layer. This <code>for</code> loop is exactly what makes RNNs deep. The unrolled version of the network is more widely used in literature and is shown below:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/unrolled.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/unrolled.PNG" alt="" style="max-width: 400px">
     
     
 </figure>
@@ -219,7 +219,7 @@ window.onload = wrap_img;
 <p>This deep nature is precisely the reason why such networks cannot <em>practically</em> model long-term dependencies. As the length of the input sequence increases, the number of matrix multiplications within the network increase. The weight updates of the earlier layers suffer as the gradients tend to vanish for them. Intuitively, think of this as multiplying a number less than zero with itself. The values become low exponentially. On the other hand if gradient values are larger than 1, these explode into large numbers that the computer can no longer make sense of. Consider this for intuition:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/grads.png" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/grads.png" alt="" style="max-width: 400px">
     
     
 </figure>
@@ -246,11 +246,18 @@ window.onload = wrap_img;
 The following figure shows an LSTM cell with labelled gates and all the computations that take place inside the cell. Each cell has 3 inputs: the current token $x_{t}$, previous hidden state $h_{t-1}$ and the previous cell state $c_{t-1}$ and 2 outputs: the updated hidden state $h_{t}$ and cell state $c_{t}$.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/lstm_cell.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/lstm_cell.PNG" alt="" style="max-width: 700px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="The-forget-gate">
 <a class="anchor" href="#The-forget-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>The forget gate<a class="anchor-link" href="#The-forget-gate"> </a>
 </h3>
@@ -259,11 +266,18 @@ The sigmoid function restricts the input values between 0 and 1. This output is 
 The equation for this gate is:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/fgate.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/fgate.PNG" alt="" style="max-width: 350px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="The-input-and-the-cell-gate">
 <a class="anchor" href="#The-input-and-the-cell-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>The input and the cell gate<a class="anchor-link" href="#The-input-and-the-cell-gate"> </a>
 </h3>
@@ -271,11 +285,18 @@ The equation for this gate is:
 The cell gate and the input gate work closely together to perform a very specific function. This function is to update the previous cell state. To do so, the cell gate proposes an update candidate. You can think of this update candidate as a proposed new cell state. To calculate the cell gate output, a <code>tanh</code> activation is used (more on this later). The equation for the cell state is:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/igate.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/igate.PNG" alt="" style="max-width: 370px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Cell-update">
 <a class="anchor" href="#Cell-update" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cell update<a class="anchor-link" href="#Cell-update"> </a>
 </h3>
@@ -284,22 +305,36 @@ From the previous blocks, we know the following:<br>
 Given the current input, the forget gate decides what information from the previous cell state can be forgotten. This is done by multiplying the forget gate output $f_{t}$ with the previous cell state $c_{t-1}$. Also, the input gate determines what information from the current input is relevant. Product of $i_{t}$ and the proposed cell state would give us important parts from the proposed cell state. We thus combine these two to yeild the following cell update equation:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/cgate.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/cgate.PNG" alt="" style="max-width: 350px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Output-gate">
 <a class="anchor" href="#Output-gate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Output gate<a class="anchor-link" href="#Output-gate"> </a>
 </h3>
 <p>This gate is used to calculate the hidden state for the next time step. Again the current input $x_{t}$ and previous hidden state $h_{t-1}$ are multiplied by a weight matrix $W_{o}$ and passed through sigmoid activation. To update the hidden state of the cell, it might be a good idea to incorporate some information from the newly updated cell state. Therefore, the result of the output gate $o_{t}$ is multiplied with the updated cell state $c_{t}$ after passing $c_{t}$ through tanh activation (explained later). The equation for this gate is:
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/ogate.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/ogate.PNG" alt="" style="max-width: 350px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Why-do-we-use-tanh-for-calculating-cell-state?">
 <a class="anchor" href="#Why-do-we-use-tanh-for-calculating-cell-state?" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Why do we use tanh for calculating cell state?</em><a class="anchor-link" href="#Why-do-we-use-tanh-for-calculating-cell-state?"> </a>
 </h3>
@@ -309,7 +344,7 @@ Given the current input, the forget gate decides what information from the previ
 <li>Another reason for using tanh is the relatively larger value of its derivative. Backprop computations result in multiplication of derivatives of the activation function multiple times depending upon the number of layers in the network. The maximum value for the derivative of a sigmoid function is 0.25 whereas that for tanh is 1. Hence, if the network is reasonably deep, the gradients of sigmoid are more likely to vanish than those of tanh.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/tanh.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/tanh.PNG" alt="" style="max-width: 450px">
     
     
 </figure>

@@ -443,6 +443,13 @@ torch.Size([64])
 <li>dropout : If provided, applied between consecutive LSTM layers except the last layer.</li>
 <li>bidirectional : If <code>True</code>, it becomes a bidirectional LSTM. That is it reads the sequence from both the directions. The forward direction starts from $x_{0}$ and goes till $x_{n}$ and backward direction goes from $x_{n}$ to $x_{0}$.</li>
 </ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p><code>seq_len</code> mentioned above is the length of the input sentence. This will be the same for all the examples within a single batch.
 For the rest of this post we are going to take <code>batch_first</code> = <code>True</code></p>
 <h4 id="Inputs">
@@ -465,7 +472,7 @@ For the rest of this post we are going to take <code>batch_first</code> = <code>
 The following figure shows a general case of LSTM implementation. 
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/lstmpt.PNG" alt="">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/lstmpt.PNG" alt="" style="max-width: 800px">
     
     
 </figure>
@@ -479,7 +486,25 @@ The following figure shows a general case of LSTM implementation.
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
 <li>The horizontal axis or the time axis determines the sequence length or the inputs at various time-steps. The vertical axis determines how many LSTM layers have been stacked together. Beginning from the first layer at the bottom, adding each layer increases the depth of the network. The number of layers are denoted by <code>w</code> in this figure.   </li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
 <li>As evident, for each time-step t the LSTM unit takes in $h_{t-1}$, $c_{t-1}$ and $x_{t}$ and gives $h_{t}$  and $c_{t}$. The newly calculated $h_{t}$ and $c_{t}$ are passed to next LSTM unit as hidden and cell state of the sequnce seen so far. Simultaneously $h_{t}$ is also passed as the <strong>output</strong> for that time-step. This is used as the input for stacked layers above the current layer and finally to calculate predictions. Therefore the <code>output</code> of LSTM layer actually contains the hidden states of all time-steps passed through all the layers. Basically, it holds ( $h^{w}_{1}$, $h^{w}_{2}$,  ... $h^{w}_{n}$).  </li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
 <li>The final hidden and cell states denoted by $h_{n}$ and $c_{n}$ for all the layers are stacked in <code>(h_n, c_n)</code> output of the LSTM layer. Therefore <code>(h_n, c_n)</code> hold (($h^{1}_{n}$,  $c^{1}_{n}$) ,  ($h^{2}_{n}$,  $c^{2}_{n}$) ... ($h^{w}_{n}$,  $c^{w}_{n}$)) where <code>w</code> is number of layers stacked in the LSTM.</li>
 </ul>
 
