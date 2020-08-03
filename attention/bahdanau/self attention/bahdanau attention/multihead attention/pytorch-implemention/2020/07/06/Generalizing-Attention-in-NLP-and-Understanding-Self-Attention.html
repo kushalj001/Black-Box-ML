@@ -9,14 +9,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
 <meta property="og:description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
-<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
-<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
 <meta property="og:site_name" content="Black Box ML" />
-<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/_notebooks/images/seq2seq.PNG" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-05-29T00:00:00-05:00" />
+<meta property="article:published_time" content="2020-07-06T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-05-29T00:00:00-05:00","datePublished":"2020-05-29T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG","@context":"https://schema.org"}</script>
+{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-07-06T00:00:00-05:00","datePublished":"2020-07-06T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/_notebooks/images/seq2seq.PNG","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Generalizing Attention in NLP and Understanding Self-Attention | Black Box ML</title>
@@ -25,14 +25,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
 <meta property="og:description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
-<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
-<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
 <meta property="og:site_name" content="Black Box ML" />
-<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/_notebooks/images/seq2seq.PNG" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-05-29T00:00:00-05:00" />
+<meta property="article:published_time" content="2020-07-06T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-05-29T00:00:00-05:00","datePublished":"2020-05-29T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG","@context":"https://schema.org"}</script>
+{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-07-06T00:00:00-05:00","datePublished":"2020-07-06T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/_notebooks/images/seq2seq.PNG","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -103,8 +103,8 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Generalizing Attention in NLP and Understanding Self-Attention</h1><p class="page-description">Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-29T00:00:00-05:00" itemprop="datePublished">
-        May 29, 2020
+    <h1 class="post-title p-name" itemprop="name headline">Generalizing Attention in NLP and Understanding Self-Attention</h1><p class="page-description">Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-07-06T00:00:00-05:00" itemprop="datePublished">
+        Jul 6, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
     
@@ -120,12 +120,6 @@ window.onload = wrap_img;
         &nbsp;
       
         <a class="category-tags-link" href="/black-box-ml/categories/#Bahdanau">Bahdanau</a>
-        &nbsp;
-      
-        <a class="category-tags-link" href="/black-box-ml/categories/#Cho">Cho</a>
-        &nbsp;
-      
-        <a class="category-tags-link" href="/black-box-ml/categories/#Benjio">Benjio</a>
         &nbsp;
       
         <a class="category-tags-link" href="/black-box-ml/categories/#Self Attention">Self Attention</a>
@@ -148,19 +142,19 @@ window.onload = wrap_img;
         <div class="pb-5 d-flex flex-wrap flex-justify-end">
           <div class="px-2">
 
-    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" role="button" target="_blank">
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-07-06-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" role="button" target="_blank">
 <img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
     </a>
 </div>
 
           <div class="px-2">
-    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-07-06-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
         <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
     </a>
 </div>
 
           <div class="px-2">
-    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-07-06-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
         <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
     </a>
 </div>
@@ -191,7 +185,7 @@ window.onload = wrap_img;
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
-# file to edit: _notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb
+# file to edit: _notebooks/2020-07-06-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb
 -->
 
 <div class="container" id="notebook-container">
@@ -408,9 +402,22 @@ In code this is achieved by calculating the <code>energy</code> of $K$ and $Q$ u
 <p><em>It gives the attention layer mutiple "representation subspaces."</em></p>
 </blockquote>
 <p>These subspaces are nothing but different projection matrices. Instead of having just one projection matrix $W^{Q}$ for query, we'll have 8 projection matrices for query, key and value. Weights for each of these "subspaces" are learnt via backpropagation during training. An analogy for this can be the use of multiple convolutional filters to learn unique features from the image.<br>
-Therefore, now the dimension of key, query and value matrices would be 64 (512/8). In code, splitting weight matrices for multiple attention heads is done right after getting $K$, $Q$ and $V$. This is done by first calculating the <code>head_dimension</code> and then splitting the tensors using the <code>view</code> function.
- <img src="images/selfattn6.PNG" width="600" height="500">
-The above image shows projection matrices for 2 attention heads. There are 8 such heads. This would give us 8 $Z$ matrices in the end. The output dimension of the self attention layer should be same as the input dimension. Hence, we need to recombine the results of all the attention heads before passing the output to the next layer. To combine them, in code, we simply use <code>view</code> to drop the head dimension and further make a projection using <code>fc_o</code> to ensure that the input dimension is same as the output dimension.</p>
+Therefore, now the dimension of key, query and value matrices would be 64 (512/8). In code, splitting weight matrices for multiple attention heads is done right after getting $K$, $Q$ and $V$. This is done by first calculating the <code>head_dimension</code> and then splitting the tensors using the <code>view</code> function.</p>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn6.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The above image shows projection matrices for 2 attention heads. There are 8 such heads. This would give us 8 $Z$ matrices in the end. The output dimension of the self attention layer should be same as the input dimension. Hence, we need to recombine the results of all the attention heads before passing the output to the next layer. To combine them, in code, we simply use <code>view</code> to drop the head dimension and further make a projection using <code>fc_o</code> to ensure that the input dimension is same as the output dimension.</p>
 
 </div>
 </div>
@@ -543,7 +550,7 @@ The above image shows projection matrices for 2 attention heads. There are 8 suc
         theme="github-light"
         crossorigin="anonymous"
         async>
-</script><a class="u-url" href="/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" hidden></a>
+</script><a class="u-url" href="/black-box-ml/attention/bahdanau/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/07/06/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
