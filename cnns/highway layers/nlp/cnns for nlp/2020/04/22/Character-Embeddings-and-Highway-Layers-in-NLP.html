@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Character Embeddings and Highway Layers in NLP | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Character Embeddings and Highway Layers in NLP" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand in detail using code a repetitve pattern in many important NLP systems." />
+<meta property="og:description" content="Understand in detail using code a repetitve pattern in many important NLP systems." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/charemb1.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-22T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Understand in detail using code a repetitve pattern in many important NLP systems.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html","headline":"Character Embeddings and Highway Layers in NLP","dateModified":"2020-04-22T00:00:00-05:00","datePublished":"2020-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/charemb1.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Character Embeddings and Highway Layers in NLP | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Character Embeddings and Highway Layers in NLP" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand in detail using code a repetitve pattern in many important NLP systems." />
+<meta property="og:description" content="Understand in detail using code a repetitve pattern in many important NLP systems." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/charemb1.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-22T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Understand in detail using code a repetitve pattern in many important NLP systems.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html","headline":"Character Embeddings and Highway Layers in NLP","dateModified":"2020-04-22T00:00:00-05:00","datePublished":"2020-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/charemb1.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/black-box-ml/">Black Box ML</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/black-box-ml/about/">About Me</a><a class="page-link" href="/black-box-ml/search/">Search</a><a class="page-link" href="/black-box-ml/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Character Embeddings and Highway Layers in NLP</h1><p class="page-description">Understand in detail using code a repetitve pattern in many important NLP systems.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-04-22T00:00:00-05:00" itemprop="datePublished">
+        Apr 22, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      9 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#CNNs">CNNs</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Highway Layers">Highway Layers</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#NLP">NLP</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#CNNs for NLP">CNNs for NLP</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-04-22-Character-Embeddings-and-Highway-Layers-in-NLP.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-04-22-Character-Embeddings-and-Highway-Layers-in-NLP.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-04-22-Character-Embeddings-and-Highway-Layers-in-NLP.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Introduction">Introduction </a></li>
+<li class="toc-entry toc-h2"><a href="#Character-Embedding">Character Embedding </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Implementation">Implementation </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Highway-Networks">Highway Networks </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Importance-in-NLP-systems">Importance in NLP systems </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#References">References </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-04-22-Character-Embeddings-and-Highway-Layers-in-NLP.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">
+<a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
+</h2>
+<p>Character embeddings and Highway Layers are the trademark components of many NLP systems. They have been used extensively in literature to reduce the parameters in models, deal with Out of Vocabulary or OOV words and help in faster training of neural networks. This blog post introduces these 2 topics, explains the intuitions with illustrations and then translates everything into code.</p>
+<blockquote>
+<p>This blog post is a small excerpt from my work on paper-annotations for the task of question answering. This <a href="https://github.com/kushalj001/pytorch-question-answering">repo</a> contains a collection of important question-answering papers, implemented from scratch in pytorch with detailed explanation of various concepts/components introduced in the respective papers.</p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Character-Embedding">
+<a class="anchor" href="#Character-Embedding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Character Embedding<a class="anchor-link" href="#Character-Embedding"> </a>
+</h2>
+<p>A character embedding is calculated for each context and query word. This is done by using convolutions.</p>
+<blockquote>
+<p><em>It maps each word to a vector space using character-level CNNs.</em></p>
+</blockquote>
+<p>Using CNNs in NLP was first proposed by Yoon Kim in his paper titled <a href="https://arxiv.org/abs/1408.5882">Convolutional Neural Networks for Sentence Classification</a>. This paper tries to use CNNs in NLP as they are used in vision. Most of the state-of-the-art results in CV at that time were achieved by transfer learning from larger models pretrained on ImageNet. In this paper, they train a simple CNN with one layer of convolution on top of pretrained word vectors and hypothesized that these pretrained word vectors could work as a universal feature extractors for various classification tasks. This is analogous to the earlier layers of vision models like VGG and Inception working as generic feature extractors. The idea of character embeddings was also used in the paper titled <a href="https://arxiv.org/abs/1508.06615">Character-Aware Neural Language Models</a> by the same author. 
+The intuition is simple over here. Just as convolutional filters learn various features in an image by operating on its pixels, here they'll do so by operating on characters of words. Let's get into the working of this layer.</p>
+<p>We first pass each word through an embedding layer to get a fixed size vector. Let the embedding dimension be $d$.
+Let $C$ represent a matrix representation of word of length $l$. Therefore $C$ is a matrix with dimensions $d$ x $l$.
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/charemb1.PNG" alt="" style="max-width: 500px">
+    
+    
+</figure>
+</p>
+<p>Let $H$ represent a convolutional filter with dimensions $d$ x $w$, where $d$ is the embedding dimension and $w$ is the width or the window size of the filter.<br>
+The weights of this filter are randomly initialized and learnt parallelly via backpropogation. We convolve this filter $H$ over our word representation $C$ as shown below. 
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/charemb2.PNG" alt="" style="max-width: 500px">
+    
+    
+</figure>
+</p>
+<p>The convolution operation is simply the inner product of the filter $H$ and matrix $C$. The convolution operations can be visualized as follows:
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/charemb3.PNG" alt="" style="max-width: 900px">
+    
+    
+</figure>
+<br>
+The result of the above operation is a feature vector. A single filter is usually associated with a unique feature that it captures from the image/matrix. To get the most representative value related to the feature, we perform max pooling over the dimension of this vector.
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/charemb4.PNG" alt="" style="max-width: 500px">
+    
+    
+</figure>
+</p>
+<p>The above process was described for a single filter. This same process is repeated with $N$ number of filters. Each of these filters captures a different property of word. In an image, for example, if one filter captures the edges, another filter will capture the texture and another one the shapes in the image and so on. $N$ is also the size of the desired character embedding. In this paper authors have trained the model with $N$ = 100.</p>
+<h3 id="Implementation">
+<a class="anchor" href="#Implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation<a class="anchor-link" href="#Implementation"> </a>
+</h3>
+<p>The implementation of this layer is fairly straightforward.  The input to this layer is of dimension <code>[batch_size, seq_len, word_len]</code> where <code>seq_len</code> and <code>word_len</code> are the lengths of largest sequence and word respectively within a given batch . We first embed the character tokens into a fixed size vector using an embedding layer. This gives a vector of dimension <code>[batch_size, seq_len, word_len, emb_dim]</code>.<br>
+We then convert this tensor into a format that closely resembles an image, of type [ $N$, $C_{in}$, $H_{in}$, $W_{in}$]. The number of input channels, $C_{in}$ would be 1 and the output channels would be the desired embedding size which is 100. This is then passed through the convolution layer which gives an output of shape [ $N$, $C_{out}$, $H_{out}$, $W_{out}$]. Here,</p>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/conv.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+</p>
+<p>If <code>padding</code> = [0,0], <code>kernel_size</code> (or filter<em>size) = [$H</em>{in}$, $w$], `dilation` = [1,1], `stride` = [1,1] (as visible in images above), then,   
+$H<em>{out}$ = 1, and $W</em>{out}$ = $W_{in}$ - $w$ - 1.</p>
+<p>Since $H_{out}$ = 1, we squeeze that dimension and perform max pooling with a kernel<em>size = $L</em>{in}$. The value of $L<em>{in}$ =  $W</em>{in}$ - $w$ - 1.</p>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from&lt;em&gt;nb/images/maxpool.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+<br>
+If the kernel size = $L&lt;/em&gt;{in}$, we get $L_{out}$ = 1 if other values are default. This dimension is again squeezed to finally give us a tensor of dimension   <code>[batch_size, seq_len, output_channels (or 100)]</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">CharacterEmbeddingLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_vocab_dim</span><span class="p">,</span> <span class="n">char_emb_dim</span><span class="p">,</span> <span class="n">num_output_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_emb_dim</span> <span class="o">=</span> <span class="n">char_emb_dim</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">char_vocab_dim</span><span class="p">,</span> <span class="n">char_emb_dim</span><span class="p">,</span> <span class="n">padding_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">char_convolution</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># x = [bs, seq_len, word_len]</span>
+        <span class="c1"># returns : [batch_size, seq_len, num_output_channels]</span>
+        <span class="c1"># the output can be thought of as another feature embedding of dim 100.</span>
+        
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_embedding</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="c1"># x = [bs, seq_len, word_len, char_emb_dim]</span>
+        
+        <span class="c1"># following three operations manipulate x in such a way that</span>
+        <span class="c1"># it closely resembles an image. this format is important before </span>
+        <span class="c1"># we perform convolution on the character embeddings.</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># x = [bs, seq_len, char_emb_dim, word_len]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_emb_dim</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># x = [bs*seq_len, char_emb_dim, word_len]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># x = [bs*seq_len, 1, char_emb_dim, word_len]</span>
+        
+        <span class="c1"># x is now in a format that can be accepted by a conv layer. </span>
+        <span class="c1"># think of the tensor above in terms of an image of dimension</span>
+        <span class="c1"># (N, C_in, H_in, W_in).</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_convolution</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="c1"># x = [bs*seq_len, out_channels, H_out, W_out]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="c1"># x = [bs*seq_len, out_channels, W_out]</span>
+                
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">max_pool1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="c1"># x = [bs*seq_len, out_channels, 1] =&gt; [bs*seq_len, out_channels]</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># x = [bs, seq_len, out_channels]</span>
+        <span class="c1"># x = [bs, seq_len, features] = [bs, seq_len, 100]</span>
+        
+        
+        <span class="k">return</span> <span class="n">x</span>        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Highway-Networks">
+<a class="anchor" href="#Highway-Networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Highway Networks<a class="anchor-link" href="#Highway-Networks"> </a>
+</h2>
+<p>Highway networks were originally introduced to ease the training of deep neural networks. While researchers had cracked the code for optimizing shallow neural networks, training <em>deep</em> networks was still a challenging task owing to problems such as vanishing gradients etc. Quoting the paper,</p>
+<blockquote>
+<p><em>We present a novel architecture that enables the optimization of networks with virtually arbitrary depth. This is accomplished through the use of a learned gating mechanism for regulating information ﬂow which is inspired by Long Short Term Memory recurrent neural networks. Due to this gating mechanism, a neural network can have paths along which information can ﬂow across several layers without attenuation. We call such paths information highways, and such networks highway networks.</em></p>
+</blockquote>
+<p>This paper takes the key idea of learned gating mechanism from LSTMs which process information internally through a sequence of learned gates. The purpose of this layer is to <em>learn</em> to pass relevant information from the input. A highway network is a series of feed-forward or linear layers with a gating mechanism. The gating is implemented by using a sigmoid function which decides what amount of information should be transformed and what should be passed as it is.</p>
+<p>A plain feed-forward layer is associated with a linear transform $H$ parameterized by ($W_{H}, b_{H}$), such that for input $x$, the output $y$ is</p>
+<p>
+$$ y = g(W_{H}.x + b_{H})$$
+
+where $g$ is a non-linear activation.<br>
+For highway networks, two additional linear transforms are defined viz. $T$ ($W_{T},b_{T}$) and $C$ ($W_{C}$,$b_{C}$).
+Then,</p>
+$$ y = T(x) . H(x) + x . C(x) $$<p></p>
+<blockquote>
+<p><em>We refer to T as the transform gate and C as the carry gate, since they express how much of the output is produced by
+transforming the input and carrying it, respectively. For simplicity, in this paper we set C = 1 − T. </em></p>
+</blockquote>
+$$ y = T(x) . H(x) + x . (1 - T(x)) $$<p></p>
+$$ y = T(x) . g(W_{H}.x + b_{H}) + x . (1 - T(x)) $$<p><br>
+where $T(x)$ = $\sigma$ ($W_{T}$ . $x$ + $b_{T}$) and $g$ is relu activation.</p>
+<p>The input to this layer is the concatenation of word and character embeddings of each word. To implement this we use <code>nn.ModuleList</code> to add multiple linear layers. This is done for the gate layer as well as for a normal linear transform. In code the <code>flow_layer</code> is the same as linear transform $H$ discussed above and <code>gate_layer</code> is $T$. In the forward method we loop through each layer and compute the output according to the highway equation described above.</p>
+<p>The output of this layer for context is $X$ $\epsilon$ $R^{\ d \ X \ T}$ and for query is $Q$ $\epsilon$ $R^{\ d \ X \ J}$, where $d$ is hidden size of the LSTM, $T$ is the context length, $J$ is the query length.</p>
+<h3 id="Importance-in-NLP-systems">
+<a class="anchor" href="#Importance-in-NLP-systems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importance in NLP systems<a class="anchor-link" href="#Importance-in-NLP-systems"> </a>
+</h3>
+<p>The structure discussed so far is a recurring pattern in many NLP systems. Although this might be out of favor now with the advent of transformers and large pretrained language models, you will find this pattern in many NLP systems before transformers came into being. The idea behind this is that adding highway layers enables the network to make more efficient use of character embeddings. If a particular word is not found in the pretrained word vector vocabulary (OOV word), it will most likely be initialized with a zero vector. It then makes much more sense to look at the character embedding of that word rather than the word embedding. The soft gating mechanism in highway layers helps the model to achieve this.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">HighwayNetwork</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="n">num_layers</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)])</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">):</span>
+            
+            <span class="n">flow_value</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flow_layer</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">gate_value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">x</span><span class="p">))</span>
+            
+            <span class="n">x</span> <span class="o">=</span> <span class="n">gate_value</span> <span class="o">*</span> <span class="n">flow_value</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">gate_value</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span>
+        
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">
+<a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
+</h2>
+<ul>
+<li>Character-Aware Neural Language Models: <a href="https://arxiv.org/abs/1508.06615">https://arxiv.org/abs/1508.06615</a>
+</li>
+<li>Convolutional Neural Networks for Sentence Classification: <a href="https://arxiv.org/abs/1408.5882">https://arxiv.org/abs/1408.5882</a>
+</li>
+<li>Highway Networks: <a href="https://arxiv.org/abs/1505.00387">https://arxiv.org/abs/1505.00387</a>
+</li>
+<li>
+<a href="https://nlp.seas.harvard.edu/slides/aaai16.pdf">https://nlp.seas.harvard.edu/slides/aaai16.pdf</a>. A great resource for character embeddings. The figures in the character embedding section are taken from here.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kushalj001/black-box-ml"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/black-box-ml/cnns/highway%20layers/nlp/cnns%20for%20nlp/2020/04/22/Character-Embeddings-and-Highway-Layers-in-NLP.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/black-box-ml/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/black-box-ml/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/black-box-ml/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>All models are bad, some are useful.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

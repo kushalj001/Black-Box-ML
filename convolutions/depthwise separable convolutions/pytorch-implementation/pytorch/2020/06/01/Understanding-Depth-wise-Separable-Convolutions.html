@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Understanding Depth-wise Separable Convolutions | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Understanding Depth-wise Separable Convolutions" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code." />
+<meta property="og:description" content="Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/conv2d.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-01T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html","headline":"Understanding Depth-wise Separable Convolutions","dateModified":"2020-06-01T00:00:00-05:00","datePublished":"2020-06-01T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/conv2d.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Understanding Depth-wise Separable Convolutions | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Understanding Depth-wise Separable Convolutions" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code." />
+<meta property="og:description" content="Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/conv2d.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-01T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html","headline":"Understanding Depth-wise Separable Convolutions","dateModified":"2020-06-01T00:00:00-05:00","datePublished":"2020-06-01T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/conv2d.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/black-box-ml/">Black Box ML</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/black-box-ml/about/">About Me</a><a class="page-link" href="/black-box-ml/search/">Search</a><a class="page-link" href="/black-box-ml/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Understanding Depth-wise Separable Convolutions</h1><p class="page-description">Understand how depthwise convolutions are calculated and why they are faster than normal convolutions with intuition and illustrations and code.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-06-01T00:00:00-05:00" itemprop="datePublished">
+        Jun 1, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Convolutions">Convolutions</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Depthwise Separable Convolutions">Depthwise Separable Convolutions</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#PyTorch-Implementation">PyTorch-Implementation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#PyTorch">PyTorch</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-06-01-Understanding-Depth-wise-Separable-Convolutions.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-06-01-Understanding-Depth-wise-Separable-Convolutions.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-06-01-Understanding-Depth-wise-Separable-Convolutions.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Depthwise-Separable-Convolutions">Depthwise Separable Convolutions </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Depthwise-convolution">Depthwise convolution </a></li>
+<li class="toc-entry toc-h3"><a href="#Pointwise-convolution">Pointwise convolution </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Implementation">Implementation </a></li>
+<li class="toc-entry toc-h2"><a href="#References">References </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-06-01-Understanding-Depth-wise-Separable-Convolutions.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote>
+<p>This blog post is a small excerpt from my work on paper-annotations for the task of question answering. This <a href="https://github.com/kushalj001/pytorch-question-answering">repo</a> contains a collection of important question-answering papers, implemented from scratch in pytorch with detailed explanation of various concepts/components introduced in the respective papers. The illustrations in this blog post have been created by me using <a href="https://www.diagrams.net/">https://www.diagrams.net/</a>. You can find the other references below.</p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Depthwise-Separable-Convolutions">
+<a class="anchor" href="#Depthwise-Separable-Convolutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Depthwise Separable Convolutions<a class="anchor-link" href="#Depthwise-Separable-Convolutions"> </a>
+</h2>
+<p>Depthwise separable convolutions serve the same purpose as normal convolutions with the only difference being that they are faster because they reduce the number of multiplication operations. This is done by breaking the convolution operation into two parts: depthwise convolution and pointwise convolution.</p>
+<blockquote>
+<p><em>Depthwise separable convolutions are used rather than traditional ones, as we observe that it is memory efﬁcient and has better generalization. </em></p>
+</blockquote>
+<p>Let's understand why depthwise convolutions are faster than traditional convolution.
+Traditional convolution can be visualized as,</p>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/conv2d.PNG" alt="" style="max-width: 900px">
+    
+    
+</figure>
+</p>
+<p>Let's count the number of multiplications in a traditional convolution operation.<br>
+The number of multiplications for a single convolution operation is the number of elements inside the kernel. This is $D_{K}$ X $D_{K}$ X $M$ = $D_{K}^{2}$ X $M$.
+To get the output feature map, we slide or convolve this kernel over the input. Given the output dimensions, we perform $D_{O}$ covolutions along the width and the height of the input image. Therefore, the number of multiplications per kernel are $D_{O}^{2}$ X $D_{K}^{2}$ X $M$.<br>
+These calculations are for a single kernel. In convolutional neural networks, we usually use multiple kernels. Each kernel is expected to extract a unique feature from the input. If we use $N$ such filters, then number of multiplications become 
+$N$ X $D_{O}^{2}$ X $D_{K}^{2}$ X $M$.</p>
+<h3 id="Depthwise-convolution">
+<a class="anchor" href="#Depthwise-convolution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Depthwise convolution<a class="anchor-link" href="#Depthwise-convolution"> </a>
+</h3>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/depthconv.PNG" alt="" style="max-width: 900px">
+    
+    
+</figure>
+</p>
+<p>In depthwise convolution we perform convolution using kernels of dimension $D_{K}$ X $D_{K}$ X 1. Therefore the number of multiplications in a single convolution operation would be $D_{K}^{2}$ X $1$. If the output dimension is $D_{O}$, then the number of multiplications per kernel are $D_{K}^{2}$ X $D_{O}^{2}$. If there are $M$ input channels, we need to use $M$ such kernels, one kernel for each input channel to get the all the features. For $M$ kernels, we then get $D_{K}^{2}$ X $D_{O}^{2}$ X $M$ multiplications.</p>
+<h3 id="Pointwise-convolution">
+<a class="anchor" href="#Pointwise-convolution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pointwise convolution<a class="anchor-link" href="#Pointwise-convolution"> </a>
+</h3>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/pointconv.PNG" alt="" style="max-width: 800px">
+    
+    
+</figure>
+</p>
+<p>This part takes the output from depthwise convolution and performs convolution operation with a kernel of size 1 X 1 X $N$, where $N$ is the desired number of output features/channels. Here similarly,<br>
+Multiplications per 1 convolution operation = 1 X 1 X $M$<br>
+Multiplications per kernel = $D_{O}^{2}$ X $M$<br>
+For N output features = $N$ X $D_{O}^{2}$ X $M$</p>
+<p>Adding up the number of multiplications from both the phases, we get,</p>
+<p>
+$$ =\  N\ .\ D_{O}^{2} \ .\ M \ +\ D_{K}^{2}\ .\ D_{O}^{2}\ .\ M $$
+
+
+$$ =\  D_{O}^{2}\ .\ M (N + D_{K}^{2}) $$
+</p>
+<p>Comparing this with traditional convolutions,</p>
+$$ =\ \frac {D_{O}^{2}\ .\ M\ (N + D_{K}^{2})} {D_{O}^{2}\ .\  M\ .\ D_{K}^{2}\ .\ N}$$<p></p>
+<p>
+$$ =\  \frac{1}{D_{K}^{2}}\ +\ \frac{1}{N} $$
+</p>
+<p>This clearly shows that the number of computations in depthwise separable convolutions are lesser than traditional ones.
+In code, the depthwise phase of the convolution is done by assigning <code>groups</code> as <code>in_channels</code>. According to the documentation,</p>
+<blockquote>
+<p><em>At groups= <code>in_channels</code>, each `nput channel is convolved with its own set of filters, of size:$\left\lfloor\frac{out\_channels}{in\_channels}\right\rfloor$</em></p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Implementation">
+<a class="anchor" href="#Implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Implementation<a class="anchor-link" href="#Implementation"> </a>
+</h2>
+<p>Following is an implementation for the layer discussed above. This is a standalone implementation of the layer and can be plugged into any application/larger model where it is used as a component.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="k">class</span> <span class="nc">DepthwiseSeparableConvolution</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+      
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthwise_conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
+                                    <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">kernel_size</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pointwise_conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+        <span class="c1"># Interpretations</span>
+        <span class="c1"># x = [bs, seq_len, emb_dim] for NLP applications</span>
+        <span class="c1"># x = [C_in, H_in, W_in] for CV applications</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointwise_conv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthwise_conv</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+      
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">
+<a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
+</h2>
+<ul>
+<li>The QANet paper: <a href="https://arxiv.org/abs/1804.09541">https://arxiv.org/abs/1804.09541</a>
+</li>
+<li>Convolutional Neural Networks for Sentence Classification: <a href="https://arxiv.org/abs/1408.5882">https://arxiv.org/abs/1408.5882</a>
+</li>
+<li>
+<a href="https://www.youtube.com/watch?v=T7o3xvJLuHk">https://www.youtube.com/watch?v=T7o3xvJLuHk</a>. Easy explanation of depthwise separable convolutions.</li>
+<li>
+<a href="https://towardsdatascience.com/a-basic-introduction-to-separable-convolutions-b99ec3102728">https://towardsdatascience.com/a-basic-introduction-to-separable-convolutions-b99ec3102728</a>. Another amazing blog for depthwise separable convolutions.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kushalj001/black-box-ml"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/black-box-ml/convolutions/depthwise%20separable%20convolutions/pytorch-implementation/pytorch/2020/06/01/Understanding-Depth-wise-Separable-Convolutions.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/black-box-ml/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/black-box-ml/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/black-box-ml/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>All models are bad, some are useful.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

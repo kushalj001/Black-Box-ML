@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Generalizing Attention in NLP and Understanding Self-Attention | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Generalizing Attention in NLP and Understanding Self-Attention" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
+<meta property="og:description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-29T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-05-29T00:00:00-05:00","datePublished":"2020-05-29T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Generalizing Attention in NLP and Understanding Self-Attention | Black Box ML</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Generalizing Attention in NLP and Understanding Self-Attention" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
+<meta property="og:description" content="Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch." />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" />
+<meta property="og:site_name" content="Black Box ML" />
+<meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-29T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html"},"@type":"BlogPosting","url":"https://kushalj001.github.io/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html","headline":"Generalizing Attention in NLP and Understanding Self-Attention","dateModified":"2020-05-29T00:00:00-05:00","datePublished":"2020-05-29T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/seq2seq.PNG","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/black-box-ml/">Black Box ML</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/black-box-ml/about/">About Me</a><a class="page-link" href="/black-box-ml/search/">Search</a><a class="page-link" href="/black-box-ml/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Generalizing Attention in NLP and Understanding Self-Attention</h1><p class="page-description">Generalizing the idea of attention in NLP and understanding various methods of calculating attention used in the literature so far. Also, understand and implement multiheaded self-attention using PyTorch.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-29T00:00:00-05:00" itemprop="datePublished">
+        May 29, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      13 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Attention">Attention</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Bahdanau">Bahdanau</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Cho">Cho</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Benjio">Benjio</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Self Attention">Self Attention</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Bahdanau Attention">Bahdanau Attention</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#Multihead Attention">Multihead Attention</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/black-box-ml/categories/#PyTorch-Implemention">PyTorch-Implemention</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Introduction">Introduction </a></li>
+<li class="toc-entry toc-h2"><a href="#Introduction-to-Attention-in-NLP">Introduction to Attention in NLP </a></li>
+<li class="toc-entry toc-h2"><a href="#Generalizing-Attention">Generalizing Attention </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Basic-Dot-Product-Attention">Basic Dot Product Attention </a></li>
+<li class="toc-entry toc-h3"><a href="#Additive-Attention">Additive Attention </a></li>
+<li class="toc-entry toc-h3"><a href="#Bilinear-Attention">Bilinear Attention </a></li>
+<li class="toc-entry toc-h3"><a href="#Scaled-Dot-Product-Attention">Scaled Dot Product Attention </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Multiheaded-Self-Attention">Multiheaded Self Attention </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Idea-of-Linear-Projections">Idea of Linear Projections </a></li>
+<li class="toc-entry toc-h3"><a href="#Self-Attention">Self Attention </a></li>
+<li class="toc-entry toc-h3"><a href="#Multiheaded-attention-and-Implementation">Multiheaded attention and Implementation </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#References">References </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-05-29-Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">
+<a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
+</h2>
+<p>Attention is one of the most important and ubiquitous concepts in NLP and deep learning. There are many blog posts out there explaining different flavors of attention. This blog post however, introduces attention as a general concept in NLP and then goes onto explain some of the most important methods of calculating attention vectors. Each sub-topic or concept is concretely supported by real-world intuitions. Lastly, this post explains the idea of multiheaded self-attention in a unique by using the idea of linear projections and concludes by showing stepwise how to translate all the intuitions to code.</p>
+<blockquote>
+<p>This blog post is a small excerpt from my work on paper-annotations for the task of question answering. This <a href="https://github.com/kushalj001/pytorch-question-answering">repo</a> contains a collection of important question-answering papers, implemented from scratch in pytorch with detailed explanation of various concepts/components introduced in the respective papers.</p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction-to-Attention-in-NLP">
+<a class="anchor" href="#Introduction-to-Attention-in-NLP" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction to Attention in NLP<a class="anchor-link" href="#Introduction-to-Attention-in-NLP"> </a>
+</h2>
+<p>Attention as a concept in NLP was introduced in 2015 by Bahdanau et al. to improve neural machine translation systems. Before this paper, NMT systems were largely based on seq2seq architectures which had an encoder to encode a representation of the source language and a decoder which to decode this representation into the target language. Such models were trained on large quantities of parallel text data of two languages. One major drawback of this architecture was that it didn't work well for longer documents/sequences. This is because the entire information in the source sentence was being crammed into a single vector. If this vector fails to capture the important information from the source language, the system is going to perform poorly.<br>
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/seq2seq.PNG" alt="" style="max-width: 700px">
+    
+    
+</figure>
+</p>
+<p>When we claim that these neural nets mimic the human brain, this is certainly not how the human brain works. While <em>learning</em> about some topic, we do not simply read 2-3 pages of content and expect our brain to remember all the details in the first go. We usually revisit various concepts, recollect and refer to the material back and forth before mastering it. The attention mechanism in NMT was designed to do this. While decoding at any particular time step, encoder hidden states from all the time-steps are made available to the decoder. The decoder then can look back at the encoder hidden states or the source language and make a more informed prediction at a particular time-step. This alieviates the problem of all the information from source language being crammed into a single vector.<br>
+To illustrate this with equations, consider that the hidden states of the encoder RNN are represented by $H$ = {$h_{1}, h_{2}, h_{3},...,h_{t}$}. While decoding the token at position $t$, the input to the decoder unit is hidden state from previous unit $s_{t-1}$ and an attention vector which is a selective summary of the encoder hidden states and helps the decoder to pay more attention to a particular encoder state. 
+The similarity between the encoder hidden states $H$ and the decoder hidden state so far $s_{t-1}$ is computed by,<br>
+$$ \alpha = tanh (W [H ; s_{t-1}]) $$</p>
+<p>$\alpha$ is then passed through a softmax layer to obtain attention distribution such that $\sum_{t} \alpha_{t}$ = 1.
+The final step is calculating the attention vector by taking a weighted sum of the encoder hidden states,
+
+$$ \sum_{t} \alpha_{t} h_{t} $$
+</p>
+<p>The following diagram illustrates this process.</p>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/attnkj.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+</p>
+<p>Since then, many different forms of attention have been proposed and used in the literature. Attention is not limited to NMT systems and has evolved into a more general concept in NLP. At the heart of it attention is about summarizing a particular entity/representation by <em>attending</em> to the important parts of this representation. 
+A more general definition of attention is as follows:</p>
+<blockquote>
+<p><em><strong>Given a set of vectors <code>values</code>, and a single vector <code>query</code>, attention is a method to calculate a weighted sum of the values, where the query determines which values to focus on.</strong></em></p>
+</blockquote>
+<p>It is a way to obtain a fixed size representation of an arbitrary set of representations (values), dependent on some other representation (query).</p>
+<p>In our earlier NMT example, the encoder hidden states {$h_{1}, h_{2}, h_{3},...,h_{t}$} are the <strong><em>values</em></strong> and the decoder hidden state $s_{t-1}$ is the <strong><em>query</em></strong>.</p>
+<h2 id="Generalizing-Attention">
+<a class="anchor" href="#Generalizing-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Generalizing Attention<a class="anchor-link" href="#Generalizing-Attention"> </a>
+</h2>
+<p>In general there are 3 steps when calculating the attention. Consider that values are represented by {$h_{1}, h_{2}, h_{3},..h_{n}$} and query is $s$. Then attention always involves,</p>
+<ol>
+<li>Calculating the energy $e$ or attention scores between these 2 vectors,
+$e$   $ \epsilon$  $ R^{N} $</li>
+<li>Taking softmax to get an attention distribution $\alpha$, $\alpha$ $\epsilon$ $R^{N}$</li>
+</ol>
+$$ \alpha = softmax(e)$$<p>
+
+$$ \sum_{t}^{N} \alpha_{t} = 1 $$
+</p>
+<ol>
+<li>Taking the weighted sum of the <code>values</code> by using $\alpha$
+
+$$ a = \sum_{t}^{N}\alpha_{t}h_{t} $$
+</li>
+</ol>
+<p>Now there are different ways to calculate the energy between <code>query</code> and <code>values</code>.</p>
+<h3 id="Basic-Dot-Product-Attention">
+<a class="anchor" href="#Basic-Dot-Product-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic Dot Product Attention<a class="anchor-link" href="#Basic-Dot-Product-Attention"> </a>
+</h3>$$ e_{t} = s^{T}h_{t}$$<p></p>
+<h3 id="Additive-Attention">
+<a class="anchor" href="#Additive-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additive Attention<a class="anchor-link" href="#Additive-Attention"> </a>
+</h3>$$ e_{t} = v^{T} tanh (W [h_{t};s])$$<p><br>
+This is nothing but the <a href="https://www.google.com/search?q=bahdanau+attention&amp;rlz=1C1CHBF_enIN768IN768&amp;oq=bahdanau+&amp;aqs=chrome.0.0l2j69i57j0l5.2315j0j9&amp;sourceid=chrome&amp;ie=UTF-8">Bahdanau attention</a> attention first proposed for NMT systems.</p>
+<h3 id="Bilinear-Attention">
+<a class="anchor" href="#Bilinear-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bilinear Attention<a class="anchor-link" href="#Bilinear-Attention"> </a>
+</h3>
+<p>
+$$ e_{t} = s^{T} W h_{t}$$
+
+where $W$ is a trainable weight vector.
+This has been used extensively in Question Answering systems like the Stanford Attentive Reader and <a href="https://www.google.com/search?q=drqa&amp;rlz=1C1CHBF_enIN768IN768&amp;oq=drqa&amp;aqs=chrome.0.69i59j0l4j69i60l3.1379j0j7&amp;sourceid=chrome&amp;ie=UTF-8">DrQA</a></p>
+<h3 id="Scaled-Dot-Product-Attention">
+<a class="anchor" href="#Scaled-Dot-Product-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scaled Dot Product Attention<a class="anchor-link" href="#Scaled-Dot-Product-Attention"> </a>
+</h3>
+<p>
+$$ e_{t} = s^{T}h_{t}/\sqrt n$$
+
+where $n$ is the model size. A modified version of this proposed in the Transformers paper by Vaswani et al. is now employed in almost every NLP system. The following section explains this attention in more detail.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Multiheaded-Self-Attention">
+<a class="anchor" href="#Multiheaded-Self-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiheaded Self Attention<a class="anchor-link" href="#Multiheaded-Self-Attention"> </a>
+</h2>
+<h3 id="Idea-of-Linear-Projections">
+<a class="anchor" href="#Idea-of-Linear-Projections" aria-hidden="true"><span class="octicon octicon-link"></span></a>Idea of Linear Projections<a class="anchor-link" href="#Idea-of-Linear-Projections"> </a>
+</h3>
+<p>Consider a system of an online book store like kindle, which lets you rent, buy and read books on its platform. Such platforms usually have a recommendation system (recsys) in place that enables them to understand their users' taste and preferences over time. This helps them in making personalized recommendations to users and in turn improve their revenue.
+For simplicity, let's assume that there are 10,000 books available on the platform and the system maintain a simple binary vector of size 10,000 for each user. If a user has read a particular book, the position in the vector corresponding to the book's id is 1 and 0 otherwise. A <em>books-read</em> vector for a user looks like,
+$$ [1,0,0,1,1,0,0,0,0,1,1,...,1] $$</p>
+<p>Now assume a projection matrix of dimension 10,000 X 100. When we multiply any user's books vector, we get a new low dimensional vector of size 100. This vector is totally different from the previous one and now represents the user's taste or preferences in books. It basically represents a user-profile for the recommendation system. Calculating this user-taster vector for different users enables the application to find users with similar taste and recommend books that they <em>might</em> like simply based on what the other "similar" user has read.<br>
+The weights or values of this projection matrix can be thought as representing certain features or properties that a book might possess. It might capture various genres like science, philsophy, fantasy novels, etc.<br>
+The question that still remains however, is how do we get such a projection matrix in the first place that can transform a represenation from one vector space to another that is somehow related to the original vector but has an entirely different interpretation.<br>
+This is exactly what deep learning is about. Neural networks work as this <em>universal function approximators</em> that helps in learning such transformations. The weights of such projection matrices are learned via backpropagation. We also need a lot of training data to achieve this.</p>
+<h3 id="Self-Attention">
+<a class="anchor" href="#Self-Attention" aria-hidden="true"><span class="octicon octicon-link"></span></a>Self Attention<a class="anchor-link" href="#Self-Attention"> </a>
+</h3>
+<p>Much of what will follow is heavily derived from Jay Alammar's famous blog post: The Illustrated Transformer. The intuition and visualizations can be directly converted into code and that's my main motive here. To understand the details, we'll first look at self attention using vectors at a granular level. We'll then show how actually these computations are made using matrices which directly correspond to the code. For convenience, we'll explain how self attention works in the transformer model. The input to the self attention layer is an embedding vector.<br>
+The central idea of attention is the same as discussed in the first notebook. Even here we'll calculate the measure of similarity between two representations, convert them into an attention distribution and take a weighted sum with the values. However, there are certain details involved that need to be addressed.<br>
+Following steps involved in calculating self-attention.</p>
+<ol>
+<li>
+<p>The first step is to project the input into 3 different vector spaces: key space, query space and value space. These projections give us a key vector, a query vector and a value vector. The weights of these projection matrices are learnt via backpropagation during training. The projection matrices for key, query and value are $W^{K}$, $W^{Q}$, $W^{V}$ respectively. These projections are exactly what we discussed above. Their values depend a lot on the training procedure and the training data.<br>
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn1.PNG" alt="" style="max-width: 700px">
+    
+    
+</figure>
+</p>
+</li>
+<li>
+<p>The next step is to calculate attention scores. This is basically the part where we determine how similar are two input vectors and hence how much attention/focus needs to be paid on one vector while summarizing the other.</p>
+<blockquote>
+<p><em>The score determines how much focus to place on other parts of the input sentence as we encode a word at a certain position.</em></p>
+</blockquote>
+<p>There are different ways to determine this. In this paper, a dot product between the query and the key is used. Consider the phrase "Thinking Machines". For the word "Thinking", we need to calculate a score with each word in the sentence including "Thinking" itself. Therefore, score for first position would be,
+
+$$ q_{1}\ .\ k_{1} $$
+
+The result of this product represents the amount of attention we need to pay to "Thinking" itself while encoding "Thinking".
+The score for next position would be,
+
+$$ q_{1}\ .\ k_{2} $$
+
+which captures the importance of "Machines" while encoding "Thinking".</p>
+</li>
+<li>We then divide the scores calculated in the previous step by $\sqrt d_{k}$, where $d_{k}$ is the dimension of key vectors. This scaling was done to ensure that the gradients are stable during training. Next, these scores are passed through a softmax function to get an attention distribution. This means that for a sentence of length $n$, if $\alpha_{t}$ represents the score at $t$-th position, then
+
+$$ \sum_{t=1}^{n} \alpha_{t} = 1$$
+</li>
+<li>The last step is to multiply the softmax output with the value vector at respective position and sum these products up. In effect this computes a weighted sum. For a sentence of length n,
+
+$$ \sum_{t=1}^{n} \alpha_{t}\ v_{t}$$
+</li>
+</ol>
+<p>All the steps explained above can be summarized as,<br>
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn2.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+</p>
+<h3 id="Multiheaded-attention-and-Implementation">
+<a class="anchor" href="#Multiheaded-attention-and-Implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiheaded attention and Implementation<a class="anchor-link" href="#Multiheaded-attention-and-Implementation"> </a>
+</h3>
+<p>The above steps are usually performed using matrices instead of vectors. This is also where we'll see how and why multihead attention is implemented.</p>
+<ol>
+<li>The first step is to calculate the query, key and value matrices by projecting them using trainable weights. In code, these weights correspond to linear layers. $W^{Q}$ corresponds to <code>fc_q</code>, $W^{K}$ to <code>fc_k</code> and $W^{V}$ to <code>fc_v</code>. Projecting these gives us $Q$, $K$ and $V$ as seen in code too. </li>
+</ol>
+<p><figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn3.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+
+Similar representations for value and key are also calculated. The dimensions of the above matrices will be explained below.</p>
+<ol>
+<li>Calculation of scores can be easily visualized as follows,
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn4.PNG" alt="" style="max-width: 800px">
+    
+    
+</figure>
+<br>
+In code this is achieved by calculating the <code>energy</code> of $K$ and $Q$ using <code>torch.matmul</code>.</li>
+<li>The final step is to scale, take softmax of the scores and multiply the matrix by the value matrix.
+<code>scale</code> is calculated by taking the square root of <code>head_dim</code>. After scaling the <code>energy</code> tensor or the scores at different positions, we apply softmax to this tensor and multiply it with $V$ using <code>torch.matmul</code> once again. 
+<figure>
+  
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/selfattn5.PNG" alt="" style="max-width: 600px">
+    
+    
+</figure>
+</li>
+</ol>
+<p>In the original transformer model, the input embedding size is 512. Before projecting these embeddings, we split them into 8 parts which brings us to multihead attention. This paper uses 8 attention heads.<br>
+ Multiheaded attention expands the model's ability to focus on different positions.</p>
+<blockquote>
+<p><em>It gives the attention layer mutiple "representation subspaces."</em></p>
+</blockquote>
+<p>These subspaces are nothing but different projection matrices. Instead of having just one projection matrix $W^{Q}$ for query, we'll have 8 projection matrices for query, key and value. Weights for each of these "subspaces" are learnt via backpropagation during training. An analogy for this can be the use of multiple convolutional filters to learn unique features from the image.<br>
+Therefore, now the dimension of key, query and value matrices would be 64 (512/8). In code, splitting weight matrices for multiple attention heads is done right after getting $K$, $Q$ and $V$. This is done by first calculating the <code>head_dimension</code> and then splitting the tensors using the <code>view</code> function.
+ <img src="images/selfattn6.PNG" width="600" height="500">
+The above image shows projection matrices for 2 attention heads. There are 8 such heads. This would give us 8 $Z$ matrices in the end. The output dimension of the self attention layer should be same as the input dimension. Hence, we need to recombine the results of all the attention heads before passing the output to the next layer. To combine them, in code, we simply use <code>view</code> to drop the head dimension and further make a projection using <code>fc_o</code> to ensure that the input dimension is same as the output dimension.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="k">class</span> <span class="nc">MultiheadAttentionLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hid_dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hid_dim</span> <span class="o">=</span> <span class="n">hid_dim</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hid_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_q</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hid_dim</span><span class="p">,</span> <span class="n">hid_dim</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_k</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hid_dim</span><span class="p">,</span> <span class="n">hid_dim</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_v</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hid_dim</span><span class="p">,</span> <span class="n">hid_dim</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hid_dim</span><span class="p">,</span> <span class="n">hid_dim</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="c1"># x = [bs, len_x, hid_dim]</span>
+        <span class="c1"># mask = [bs, len_x]</span>
+        
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_k</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_v</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Q = K = V = [bs, len_x, hid_dim]</span>
+        
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># [bs, len_x, num_heads, head_dim ]  =&gt; [bs, num_heads, len_x, head_dim]</span>
+        
+        <span class="n">K</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># [bs, num_heads, head_dim, len_x]</span>
+        
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+        <span class="c1"># (bs, num_heads){[len_x, head_dim] * [head_dim, len_x]} =&gt; [bs, num_heads, len_x, len_x]</span>
+        
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># [bs, 1, 1, len_x]</span>
+        
+        <span class="c1">#print("Mask: ", mask)</span>
+        <span class="c1">#print("Energy: ", energy)</span>
+        
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e10</span><span class="p">)</span>
+        
+        <span class="c1">#print("energy after masking: ", energy)</span>
+        
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1">#  [bs, num_heads, len_x, len_x]</span>
+        
+        <span class="c1">#print("energy after smax: ", alpha)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+        <span class="c1"># [bs, num_heads, len_x, head_dim]</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># [bs, len_x, num_heads, hid_dim]</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hid_dim</span><span class="p">)</span>
+        <span class="c1"># [bs, len_x, hid_dim]</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_o</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="c1"># [bs, len_x, hid_dim]</span>
+        
+        <span class="c1">#print("Multihead output: ", a.shape)</span>
+        <span class="k">return</span> <span class="n">a</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="References">
+<a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
+</h2>
+<ul>
+<li>Attention is All You Need <a href="https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf">https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf</a>
+</li>
+<li><a href="https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html">https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html</a></li>
+<li>The Illustrated Transformer:<a href="http://jalammar.github.io/illustrated-transformer/">http://jalammar.github.io/illustrated-transformer/</a>. This is an excellent piece of writing with amazing easy-to-understand visualizations. Must read.</li>
+<li>
+<a href="https://mccormickml.com/2019/11/11/bert-research-ep-1-key-concepts-and-sources/">https://mccormickml.com/2019/11/11/bert-research-ep-1-key-concepts-and-sources/</a>. Chris McCormick's BERT research series is another great resource to learn about self attention and various other details about BERT. He has a blog as well as youtube video series on the same.</li>
+<li>
+<a href="https://nlp.seas.harvard.edu/2018/04/03/attention.html">https://nlp.seas.harvard.edu/2018/04/03/attention.html</a>. The annotated Transformer.</li>
+<li>
+<a href="https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1184/lectures/lecture10.pdf">https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1184/lectures/lecture10.pdf</a>.</li>
+<li>
+<a href="https://github.com/bentrevett/pytorch-seq2seq">https://github.com/bentrevett/pytorch-seq2seq</a>. A great series of notebooks on Machine Translation using PyTorch which includes all the the methods discussed above in greater detail and context.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kushalj001/black-box-ml"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/black-box-ml/attention/bahdanau/cho/benjio/self%20attention/bahdanau%20attention/multihead%20attention/pytorch-implemention/2020/05/29/Generalizing-Attention-in-NLP-and-Understanding-Self-Attention.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/black-box-ml/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/black-box-ml/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/black-box-ml/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>All models are bad, some are useful.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
