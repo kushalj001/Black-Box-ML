@@ -9,14 +9,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Understanding why do VAEs suffer with posterior collapse for text generation" />
 <meta property="og:description" content="Understanding why do VAEs suffer with posterior collapse for text generation" />
-<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
-<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
 <meta property="og:site_name" content="Black Box ML" />
 <meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/bowman.PNG" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-04-22T00:00:00-05:00" />
+<meta property="article:published_time" content="2021-04-22T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2020-04-22T00:00:00-05:00","datePublished":"2020-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"@context":"https://schema.org"}</script>
+{"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-04-22T00:00:00-05:00","datePublished":"2021-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Generating Text with VAEs and Posterior Collapse | Black Box ML</title>
@@ -25,14 +25,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Understanding why do VAEs suffer with posterior collapse for text generation" />
 <meta property="og:description" content="Understanding why do VAEs suffer with posterior collapse for text generation" />
-<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
-<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
+<link rel="canonical" href="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
+<meta property="og:url" content="https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" />
 <meta property="og:site_name" content="Black Box ML" />
 <meta property="og:image" content="https://kushalj001.github.io/black-box-ml/images/bowman.PNG" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-04-22T00:00:00-05:00" />
+<meta property="article:published_time" content="2021-04-22T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2020-04-22T00:00:00-05:00","datePublished":"2020-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"@context":"https://schema.org"}</script>
+{"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-04-22T00:00:00-05:00","datePublished":"2021-04-22T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -103,8 +103,8 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Generating Text with VAEs and Posterior Collapse</h1><p class="page-description">Understanding why do VAEs suffer with posterior collapse for text generation</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-04-22T00:00:00-05:00" itemprop="datePublished">
-        Apr 22, 2020
+    <h1 class="post-title p-name" itemprop="name headline">Generating Text with VAEs and Posterior Collapse</h1><p class="page-description">Understanding why do VAEs suffer with posterior collapse for text generation</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-04-22T00:00:00-05:00" itemprop="datePublished">
+        Apr 22, 2021
       </time>
        • <span class="read-time" title="Estimated read time">
     
@@ -142,19 +142,19 @@ window.onload = wrap_img;
         <div class="pb-5 d-flex flex-wrap flex-justify-end">
           <div class="px-2">
 
-    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2020-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" role="button" target="_blank">
+    <a href="https://github.com/kushalj001/black-box-ml/tree/master/_notebooks/2021-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" role="button" target="_blank">
 <img class="notebook-badge-image" src="/black-box-ml/assets/badges/github.svg" alt="View On GitHub">
     </a>
 </div>
 
           <div class="px-2">
-    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2020-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" target="_blank">
+    <a href="https://mybinder.org/v2/gh/kushalj001/black-box-ml/master?filepath=_notebooks%2F2021-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" target="_blank">
         <img class="notebook-badge-image" src="/black-box-ml/assets/badges/binder.svg" alt="Open In Binder"/>
     </a>
 </div>
 
           <div class="px-2">
-    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2020-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" target="_blank">
+    <a href="https://colab.research.google.com/github/kushalj001/black-box-ml/blob/master/_notebooks/2021-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb" target="_blank">
         <img class="notebook-badge-image" src="/black-box-ml/assets/badges/colab.svg" alt="Open In Colab"/>
     </a>
 </div>
@@ -200,7 +200,7 @@ window.onload = wrap_img;
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
-# file to edit: _notebooks/2020-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb
+# file to edit: _notebooks/2021-04-22-Generating-Text-with-VAEs-and-Posterior-Collapse.ipynb
 -->
 
 <div class="container" id="notebook-container">
@@ -218,7 +218,7 @@ window.onload = wrap_img;
 <h2 id="Introduction">
 <a class="anchor" href="#Introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction<a class="anchor-link" href="#Introduction"> </a>
 </h2>
-<p>This blog is about my recent research on generative modeling, variational autoencoders(VAEs) and, in particular, application of VAEs for text generation. VAEs work extremely well for images but have not seen the same success in text-generation. This is because VAE training for such models usually results in the model choosing a local optimum where it learns to completely ignore the latent variable. This phenomenon is referred to as the posterior collapse in literature. This blog assumes familiarity with the basics of latent variable models and VAEs. There are a lot of great resources to understand the math beind VAEs. I begin with a small recap of latent variable models, the evidence lower bound (ELBO) and how VAEs model the probability distibutions of the ELBO. I then move on to the application of VAE models for text generation, optimization challenges and their proposed solutions. To do this, I explain 2 papers related to the topic which look at the problem in unique ways and propose different solutions for the same. I hope that by the end of this blog, the reader gains a solid understanding of the basics, motivations, challenges and the proposed solutions for training text-generating VAEs.</p>
+<p>This blog is about my recent research on generative modeling, variational autoencoders (VAEs) and, in particular, application of VAEs for text generation. VAEs work extremely well for images but have not seen the same success in text-generation. This is because VAE training for such models usually results in the model choosing a local optimum where it learns to completely ignore the latent variable. This phenomenon is referred to as the posterior collapse in literature. This blog assumes familiarity with the basics of latent variable models and VAEs. There are a lot of great resources to understand the math beind VAEs. I begin with a small recap of latent variable models, the evidence lower bound (ELBO) and how VAEs model the probability distibutions of the ELBO. I then move on to the application of VAE models for text generation, optimization challenges and their proposed solutions. To do this, I explain 2 papers related to the topic which look at the problem in unique ways and propose different solutions for the same. I hope that by the end of this blog, the reader gains a solid understanding of the basics, motivations, challenges and the proposed solutions for training text-generating VAEs.</p>
 
 </div>
 </div>
@@ -276,23 +276,37 @@ With VAE, we can use a latent variable to encode the latent space of sentences w
 Following is an example that compares a standard encoder-decoder model and a VAE by interpolating vectors between two sentences (bold) vectors. We can see that halfway through, the standard model starts generating meaningless sentences because the decoding space for the model does not correspond to any reasonable semantics. Whereas, in case of the VAE, the intermediate sentences are semantically consistent.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/sent_int.PNG" alt="" style="max-width: 600px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/sent_int.PNG" alt="" style="max-width: 800px">
     
     
 </figure>
 </p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Model">
 <a class="anchor" href="#Model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model<a class="anchor-link" href="#Model"> </a>
 </h3>
 <p>The model proposed by Bowman et al. is very similar in spirit to the VAE. The only major difference is that the MLP used to model multivariate gaussians in the encoder and the decoder is replaced by an LSTM model. Like the VAE, they also use the reparameterization trick to enable backpropagation through the network. The proposed model can be explained by the figure below.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from&lt;em&gt;nb/images/bowman.PNG" alt="" style="max-width: 800px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/bowman.PNG" alt="" style="max-width: 800px">
     
     
 </figure>
- 
-On the encoder side, we first get an embedding vector for each input token and pass it to an LSTM cell. We'll refer the tuple of hidden and cell state calculated by each LSTM unit as the hidden state for brevity. We use the hidden state vector of the final LSTM cell and consider it as the representation of the encoded sentence. This hidden state vector is then transformed by two linear layers, one to calculate the mean ($\mu&lt;/em&gt;{\phi}$) and the other to calculate the variance ($\sigma<em>{\phi}$) of $q</em>{\phi}(z\ |\ x)$. The dimension of these linear layers is generally lesser than the hidden dimension of the LSTM cell. At this point, the reparameterization trick kicks in. To calculate $z$, we sample $\epsilon$ from a standard multivariate gaussian such that,</p>
+</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On the encoder side, we first get an embedding vector for each input token and pass it to an LSTM cell. We'll refer the tuple of hidden and cell state calculated by each LSTM unit as the hidden state for brevity. We use the hidden state vector of the final LSTM cell and consider it as the representation of the encoded sentence. This hidden state vector is then transformed by two linear layers, one to calculate the mean ($\mu_{\phi}$) and the other to calculate the variance ($\sigma_{\phi}$) of $q_{\phi}(z\ |\ x)$. The dimension of these linear layers is generally lesser than the hidden dimension of the LSTM cell. At this point, the reparameterization trick kicks in. To calculate $z$, we sample $\epsilon$ from a standard multivariate gaussian such that,</p>
 $$ \epsilon \sim \mathcal{N}(0, I)$$<p></p>
 $$ z = g_{\phi}(\epsilon, x) $$<p></p>
 $$ g_{\phi}(\epsilon, x) = \mu_{\phi}(x) + \epsilon \odot \sigma_{\phi}(x) $$<p></p>
@@ -354,26 +368,34 @@ Bowman et al. proposed the following solutions.</li>
 <p>This technique can be put under the first catergory of solutions to deal with posterior collapse. The KL term is multiplied by a variable weight which is 0 during the initial stages of training. The weight is then increased progressively during training until it becomes 1 which is when it trains according to the normal VAE equation. Intuitively, not penalizing the KL term initially allows the encoder to pack as much information as possible into the latent variable $z$ for the decoder to use when we gradually begin penalizing KL.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/kl&lt;em&gt;annealing.PNG" alt="" style="max-width: 600px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/kl_annealing.PNG" alt="" style="max-width: 600px">
     
     
 </figure>
- 
-The graph above, taken directly from the paper summarizes the behaviour of the KL term and the variable weight. In the initial stages, when the variable weight is 0, the KL term spikes because the encoder, $q&lt;/em&gt;{\phi}(z\ |\ x)$, can take in a lot of information without incurring any penalty. This drives $q_{\phi}(z\ |\ x)$ away from the prior, $p(z)$, hence the rise in KL. Then, as we gradually start increasing the variable weight, the value of KL term drops once the weight reaches 1. Finally, the KL term increases slowly as it converges and learns to pack information in $z$. The rate of increasing the variable weight is tuned as a hyperparameter.</p>
+</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The graph above, taken directly from the paper summarizes the behaviour of the KL term and the variable weight. In the initial stages, when the variable weight is 0, the KL term spikes because the encoder, $q_{\phi}(z\ |\ x)$, can take in a lot of information without incurring any penalty. This drives $q_{\phi}(z\ |\ x)$ away from the prior, $p(z)$, hence the rise in KL. Then, as we gradually start increasing the variable weight, the value of KL term drops once the weight reaches 1. Finally, the KL term increases slowly as it converges and learns to pack information in $z$. The rate of increasing the variable weight is tuned as a hyperparameter.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="Word-Dropout">
 <a class="anchor" href="#Word-Dropout" aria-hidden="true"><span class="octicon octicon-link"></span></a>Word Dropout<a class="anchor-link" href="#Word-Dropout"> </a>
 </h4>
-<p>In vanilla dropout, we drop off some percentage of neurons from the neural network by setting the weights of these neurons as zero for that particular forward and backward pass. The idea behind dropout is to remove any dependencies between neurons and enable them to learn more robust features. It can also be thought of as a regularization technique since we are penalizing the model by not allowing it to use all the neurons and hence learn more complex features from the data. Word dropout proposed in Bowman et al. is similar in spirit. It is a way of weakening the decoder by reducing the information provided to the decoder directly. One way to implement this would be to dynamically update the embedding layer in the decoder. However, partially updating weights in an embedding layer during training is not as straightforward as it seems. Instead, word dropout is parameterized by a word keep rate $k\ \epsilon\  [0,1]$. At $k\ =\ 0$, the decoder has no inputs and predicts only based on the previously generated words and the latent variable $z$. The authors replace the ground-truth/label words with \<unk> tokens randomly which forces the decoder to look at the latent variable to predict the next word correctly. Intuitively, word dropout implements something that humans do quite naturally. If we already know about the text document we're going to read, we tend to skip a few words and are still able to make sense out of it. We're essentially relying on some latent information about the document within our brains, which is analogous to the idea behind word dropout.&lt;/p&gt;
+<p>In vanilla dropout, we drop off some percentage of neurons from the neural network by setting the weights of these neurons as zero for that particular forward and backward pass. The idea behind dropout is to remove any dependencies between neurons and enable them to learn more robust features. It can also be thought of as a regularization technique since we are penalizing the model by not allowing it to use all the neurons and hence learn more complex features from the data. Word dropout proposed in Bowman et al. is similar in spirit. It is a way of weakening the decoder by reducing the information provided to the decoder directly. One way to implement this would be to dynamically update the embedding layer in the decoder. However, partially updating weights in an embedding layer during training is not as straightforward as it seems. Instead, word dropout is parameterized by a word keep rate $k\ \epsilon\  [0,1]$. At $k\ =\ 0$, the decoder has no inputs and predicts only based on the previously generated words and the latent variable $z$. The authors replace the ground-truth/label words with <strong>UNK</strong> tokens randomly which forces the decoder to look at the latent variable to predict the next word correctly. Intuitively, word dropout implements something that humans do quite naturally. If we already know about the text document we're going to read, we tend to skip a few words and are still able to make sense out of it. We're essentially relying on some latent information about the document within our brains, which is analogous to the idea behind word dropout.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -408,12 +430,19 @@ $$p_{\theta}(z\ |\ x)\ =\ q_{\phi}(z\ |\ x)\ =\ p(z)$$<p></p>
 In order to observe how the true and approximate posterior change throughout the training process, we will keep track of their means. We have already discussed how we use neural networks to model multivariate gaussians. We will denote the true model posterior mean by $\mu_{x,\ \theta}$ and that of the inference network by $\mu_{x,\ \phi}$. The latent variable $z$ used in the experiments is a scalar, which will make it easier to visualize how these means change during training. Following figure, taken directly from the paper puts the above discussion into context.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/mean_space.PNG" alt="" style="max-width: 400px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/mean_space.PNG" alt="" style="max-width: 475px">
     
     
 </figure>
- 
-The figure highlights the following,</p>
+</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The figure highlights the following,</p>
 <ul>
 <li>The x-axis denotes the mean $\mu_{x,\ \theta}$ of true model posterior, $p_{\theta}(z\ |\ x)$.</li>
 <li>The y-axis denotes the mean $\mu_{x,\ \phi}$, of inference network $q_{\phi}(z\ |\ x)$</li>
@@ -522,7 +551,7 @@ As discussed in the blog, most of the ideas to avoid posterior collapse can be b
 <p>by Yang et al. replaces the recurrent decoder with a decoder which involves dilated convolutions. Dilated convolutions enable the network to increase the receptive field without incurring additional computations. In 2D convolution with different dilation $d$ can be visualized as follows
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/dilated_2d.PNG" alt="" style="max-width: 650px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/dilated_2d.PNG" alt="" style="max-width: 750px">
     
     
 </figure>
@@ -530,7 +559,7 @@ As discussed in the blog, most of the ideas to avoid posterior collapse can be b
 As can be see, for $d = 1$, the receptive field is $3X3$, for $d=2$, it is $7X7$ and for $d=4$, it is $15X15$. In all these   convolutions the filter size  effectively remains the same since we are skipping pixels in between. This idea translates to 1D and NLP applications in a similar fashion.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/dilated_1d.PNG" alt="" style="max-width: 650px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/dilated_1d.PNG" alt="" style="max-width: 750px">
     
     
 </figure>
@@ -542,7 +571,7 @@ The authors hypothesize that there is a trade-off between contextual capacity of
 <p>by Fu et al. proposes a different KL annealing strategy. The authors argue against the de facto monotonic (Bowman et al.) KL annealing schedule and propose a cyclic schedule. Their hypothesis is based on analyzing the quality of latent variable $z$ learnt by the encoder during the initial stages of training.
 <figure>
   
-    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/cyclic.PNG" alt="" style="max-width: 350px">
+    <img class="docimage" src="/black-box-ml/images/copied_from_nb/images/cyclic.PNG" alt="" style="max-width: 450px">
     
     
 </figure>
@@ -583,13 +612,8 @@ If you find any mistakes or errors, kindly point it out in the comments below or
 </div>
 </div>
 </div>
-&lt;/div&gt;
- 
+</div>
 
-</unk></p>
-</div>
-</div></div>
-</div>
 
 
   </div><!-- from https://github.com/utterance/utterances -->
@@ -600,7 +624,7 @@ If you find any mistakes or errors, kindly point it out in the comments below or
         theme="github-light"
         crossorigin="anonymous"
         async>
-</script><a class="u-url" href="/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2020/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" hidden></a>
+</script><a class="u-url" href="/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/04/22/Generating-Text-with-VAEs-and-Posterior-Collapse.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
