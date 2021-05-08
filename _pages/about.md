@@ -4,7 +4,7 @@ title: About Me
 permalink: /about/
 ---
 
-I am an incoming MS CS grad student at University of California, San Diego. I completed my undergrad in Computer Science from Mumbai University, India. I have been working on ML/NLP problems for over 3 years now. I am currently working as an applied research scientist at [NeuralSpace AI](https://neuralspace.ai/). I am an avid football and Arsenal follower. I also like to read about Indian history and finding out about events and various philosophies that have shaped the world we currently live in. My research interests lie broadly in NLP. I have briefly explained my work and research experience below.
+I am an incoming MS CS grad student at University of California, San Diego. I completed my undergrad in Computer Science from Mumbai University, India and have been working on ML/NLP problems for over 3 years now. I am currently working as an applied research scientist at [NeuralSpace AI](https://neuralspace.ai/). I am an avid football and Arsenal follower. I also like to read about Indian history and finding out about events and various philosophies that have shaped the world we currently live in. My research interests lie broadly in NLP. I have briefly explained my work and research experience below.
 
 ## Publications
 ### [Indic-Transformers: An Analysis of Transformer Language Models for Indian Languages](https://arxiv.org/abs/2011.02323)
@@ -19,7 +19,7 @@ I am an incoming MS CS grad student at University of California, San Diego. I co
 ### NeuralSpace (October 2020-Present)- Applied Research Scientist
 * I am currently helping the company build an NLP SaaS platform from scratch with focus on low-resource languages. Our platform currently supports 55 languages which includes  indic, south-east asian, african, scandinavian and middle-east languages.
 *  During this, I worked on all the components that are required to build a modern ML/NLP system, right from basic text processing, POS-Tagging to distributed training of models and deploying them at scale.
-*  Closely worked on natural language understanding (NLU) systems. If your business involves NLU use-cases, reach out to NeuralSpace (https://neuralspace.ai/) for a demo. We are continuously adding a lot of features and have a very exciting plan ahead of us.
+*  Closely worked on natural language understanding (NLU) systems. If your business involves NLU use-cases, reach out to NeuralSpace (https://neuralspace.ai/) for a demo. We are continuously adding a lot of features and have a very exciting plan ahead of us.  
 ### NeuralSpace (August 2019-October 2020)- Research Intern
 * Developed a document analysis library from scratch. Involves a pipeline that takes in an image and returns all named-entities present in the image. Currently supports template-matching-based entity recognition for any type of PDF document. Also supports the analysis of documents with tabular data.
 * Developed a multilingual text summarization model that works for 21 languages including 11 Indian languages.   
@@ -27,7 +27,7 @@ I am an incoming MS CS grad student at University of California, San Diego. I co
 ### Neebal Technologies (June 2018-August 2018)- Software Engineering Intern
 * Integrated a handwriting recognition engine into an android app. 
 * Worked with various Android APIs like BLE, JobScheduler, etc. 
-### Unicode (January 2018-June 2020)- Python/ Android developer
+### Unicode (January 2018-June 2020)- Python/ Android developer  
 * Since my sophomore year, I have been a part of a tiered student organization at my college called [Unicode](https://github.com/djunicode) where we develop open source software projects.
 *  As a project guide, I mentored sophomores to build an android-based attendance [application](https://play.google.com/store/apps/details?id=io.github.djunicode.attendanceapp&hl=en_US) for my department. 
 ## Other Projects
