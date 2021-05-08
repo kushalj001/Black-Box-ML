@@ -33,7 +33,8 @@ I am an incoming MS CS grad student at University of California, San Diego. I co
 
 ### Unicode (January 2018-June 2020)- Python/ Android developer  
 * Since my sophomore year, I have been a part of a tiered student organization at my college called [Unicode](https://github.com/djunicode) where we develop open source software projects.
-*  As a project guide, I mentored sophomores to build an android-based attendance [application](https://play.google.com/store/apps/details?id=io.github.djunicode.attendanceapp&hl=en_US) for my department. 
+*  As a project guide, I mentored sophomores to build an android-based attendance [application](https://play.google.com/store/apps/details?id=io.github.djunicode.attendanceapp&hl=en_US) for my department.  
+
 ## Other Projects
 I like to read and implement research papers. My independent research projects include:
 * Implemented/annotated 3 papers for the task of [Question Answering](https://github.com/kushalj001/pytorch-question-answering) viz. DrQA, BiDAF, and QANet. Each implementation is in the form of a tutorial with detailed explanations about each component/layer. Was included in the dair.ai [newsletter](https://dair.ai/NLP_Newsletter_12_en/).  
