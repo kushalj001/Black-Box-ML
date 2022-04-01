@@ -17,7 +17,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-05-05T00:00:00-05:00" />
 <script type="application/ld+json">
-{"author":{"@type":"Person","name":"Kushal Jain"},"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-05-05T00:00:00-05:00","datePublished":"2021-05-05T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html","@context":"https://schema.org"}</script>
+{"author":{"@type":"Person","name":"Kushal Jain"},"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-05-05T00:00:00-05:00","datePublished":"2021-05-05T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/black-box-ml/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://kushalj001.github.io/black-box-ml/feed.xml" title="Black Box ML" /><link rel="shortcut icon" type="image/x-icon" href="/black-box-ml/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Generating Text with VAEs and Posterior Collapse | Black Box ML</title>
@@ -34,7 +34,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-05-05T00:00:00-05:00" />
 <script type="application/ld+json">
-{"author":{"@type":"Person","name":"Kushal Jain"},"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-05-05T00:00:00-05:00","datePublished":"2021-05-05T00:00:00-05:00","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html","@context":"https://schema.org"}</script>
+{"author":{"@type":"Person","name":"Kushal Jain"},"description":"Understanding why do VAEs suffer with posterior collapse for text generation","@type":"BlogPosting","headline":"Generating Text with VAEs and Posterior Collapse","dateModified":"2021-05-05T00:00:00-05:00","datePublished":"2021-05-05T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html"},"url":"https://kushalj001.github.io/black-box-ml/language%20modeling/text-generation/vaes/posterior%20collapse/nlp/elbo/2021/05/05/Generating-Text-with-VAEs-and-Posterior-Collapse.html","image":"https://kushalj001.github.io/black-box-ml/images/bowman.PNG","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -249,7 +249,7 @@ $$z \rightarrow x$$
 <a class="anchor" href="#Evidence-Lower-Bound" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evidence Lower Bound<a class="anchor-link" href="#Evidence-Lower-Bound"> </a>
 </h3>
 <p>VAEs  are a class of LVMs that optimize the evidence lower bound (ELBO) using variational inference in a way that scales well for large datasets. This can be attributed to the reparameterization trick which enables us to use gradient optimization methods like stochastic gradient descent to optimize the lower bound. The lower bound equation after applying reparameterization can be written as</p>
-$$L(\theta, \phi) = E_{q_{\phi}(z|x)}[p_{\theta}(\ x\ |\ z)] - KL\ [q_{\phi}(\ z\ |\ x\ ))\ ||\ p(z)]$$<p></p>
+$$L(\theta, \phi) = E_{q_{\phi}(z|x)}[\log p_{\theta}(\ x\ |\ z)] - KL\ [q_{\phi}(\ z\ |\ x\ ))\ ||\ p(z)]$$<p></p>
 <p>For the VAE, we have following definitions and assumptions,</p>
 <ul>
 <li>$p(z)$ is the prior which is taken a standard multivariate gaussian, with mean ($\mu$) = 0 and variance $(\sigma)$ = $I$. </li>
@@ -273,7 +273,7 @@ $$x \xrightarrow{q_{\phi}(z\ |\ x)}\ z\ \xrightarrow{p_{\theta}(x\ |\ z)}\ x$$
 <p>Language models assign probabilities to sequences of natural text and are used to predict the next best word based on previous context. The probability of a sequence with $m$ words can be modeled as,</p>
 $$ p(w_{1}, w_{2}... w_{m}) = \prod_{i=1}^{m}p(w_{i}\ |\ w_{1}, ...w_{i-1}) $$<p></p>
 <p>The above equation can be simplified using some independence assumptions wherein we assume that the probability of next word does not depend on the entire sequence but only previous $n$ words. If $n=1$, we have a unigram language model, bigram if $n=2$ and so on. For a general n-gram model, we have the following approximation,</p>
-$$ p(w_{i}\ |\ w_{1}, w_{2}... w_{i-1}) \approx \prod_{i=1}^{m}p(w_{i}|\ w_{i-(n-1)}, ...w_{i-1}) $$<p></p>
+$$ \prod_{i=1}^{m}p(w_{i}\ |\ w_{1}, w_{2}... w_{i-1}) \approx \prod_{i=1}^{n}p(w_{i}|\ w_{i-(n-1)}, ...w_{i-1}) $$<p></p>
 <p>Recurrent neural networks (RNNs) and its variants (LSTMs/GRUs) can model this factorization and work well for generating natural text. In fact, theoretically, RNNs can model any arbitrarily long and complex sequence representation without any independence assumptions mentioned above. They fail in practice however, due to a number of issues. Nevertheless, if RNNs work reasonably well, a natural argument would then be, why do we need latent variables to generate text?<br>
 One of the motivations behind this is controlled generation of text. RNNs generate text at word or token level. They take a new input at each time step and emit out the next word based on the current input and several past inputs. It records the information from previous tokens in a continuously evolving hidden state vector. By doing so, it breaks the model structure into a series of next-word predictions and fails to capture sentence-level features like topic, high-level syntax and semantics.<br>
 With VAE, we can use a latent variable to encode the latent space of sentences which captures interpretable high-level features and decode or generate words from that space.<br>
@@ -330,9 +330,9 @@ $$ q_{\phi}(z\ |\ x) \sim \mathcal{N}(z;\ \mu_{\phi}(x),\ \sigma_{\phi}(x))$$
 <a class="anchor" href="#Optimization-challenges" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optimization challenges<a class="anchor-link" href="#Optimization-challenges"> </a>
 </h3>
 <p>Training the model proposed above is not as straightforward as it seems. Training VAE models with very powerful decoders like RNNs/LSTMs is difficult because they suffer with posterior collapse. Posterior collapse occurs when the approximate posterior $q_{\phi}(z\ |\ x)$ equals (or collapses into) the prior $p(z)$. This means that the KL term in the lower bound optimization goes to zero and you're essentially only optimizing the cross-entropy loss of the decoder.</p>
-$$ L(\theta, \phi) = E_{q_{\phi}(z|x)}[p_{\theta}(\ x\ |\ z)] - KL\ [q_{\phi}(\ z\ |\ x\ ))\ ||\ p(z)] $$<p></p>
+$$ L(\theta, \phi) = E_{q_{\phi}(z|x)}[\log p_{\theta}(\ x\ |\ z)] - KL\ [q_{\phi}(\ z\ |\ x\ ))\ ||\ p(z)] $$<p></p>
 <p>
-$$ L(\theta, \phi) = E_{q_{\phi}(z|x)}[p_{\theta}(\ x\ |\ z)]\  if\  q_{\phi}(\ z\ |\ x\ ) = p(z) $$
+$$ L(\theta, \phi) = E_{q_{\phi}(z|x)}[\log p_{\theta}(\ x\ |\ z)]\  if\  q_{\phi}(\ z\ |\ x\ ) = p(z) $$
 </p>
 <p>This happens when the signal from the input $x$ to the posterior parameters is either too weak or too noisy. The decoder learns to ignore the information captured in the latent variable samples $z$ drawn from $q_{\phi}(z\ |\ x)$ altogether and results in very little signal passing from the encoder to the decoder. If the model learns to ignore $z$, the decoder is making predictions only based on the ground-truth inputs that we provide on the decoder side and is actually behaving as a general RNN language model (RNNLM). The decoding distribution can be described by the following equation,</p>
 <p>
@@ -672,7 +672,7 @@ If you find any mistakes or errors, kindly point it out in the comments below or
       </div>
     </div>
 
-    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kushalj001" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kushalj001" target="_blank" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kushalj001" target="_blank" title="kushalj001"><svg class="svg-icon grey"><use xlink:href="/black-box-ml/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
 </div>
 
   </div>
